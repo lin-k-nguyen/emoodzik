@@ -10,7 +10,7 @@ export default function Footer() {
             Emoodzi<span style={{ color: 'var(--brand)' }}>K</span>
           </Link>
           <p style={{ margin: '8px 0 0', maxWidth: 320, fontSize: 14, lineHeight: 1.6, color: 'var(--muted-fg)' }}>
-            Blog âm nhạc về đĩa, gear và nghệ thuật lắng nghe.
+            Thảo luận âm nhạc quốc tế.
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

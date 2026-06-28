@@ -42,7 +42,15 @@ export default function NewsletterSection() {
                 placeholder="you@example.com"
                 style={{ height: 48, width: '100%', border: '1px solid #fff', background: '#fff', padding: '0 20px', fontSize: 14, color: '#1a1614', outline: 'none', fontFamily: 'inherit' }}
               />
-              <button type="submit" style={{ height: 48, flex: 'none', border: 'none', background: '#fbf7f0', padding: '0 24px', fontSize: 14, fontWeight: 600, color: '#1a1614', cursor: 'pointer', fontFamily: 'inherit', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+              <button type="submit" style={{
+                height: 48, flex: 'none', border: 'none',
+                background: email.trim() ? '#ff2e2e' : '#fbf7f0',
+                padding: '0 24px', fontSize: 14, fontWeight: 600,
+                color: email.trim() ? '#fff' : '#1a1614',
+                cursor: 'pointer', fontFamily: 'inherit',
+                textTransform: 'uppercase', letterSpacing: '.05em',
+                transition: 'background .15s, color .15s',
+              }}>
                 Subscribe
               </button>
             </form>
