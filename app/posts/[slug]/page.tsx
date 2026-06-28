@@ -19,16 +19,19 @@ function calcReadingTime(body: any[]): string {
   return `${Math.max(1, Math.ceil(words / 200))} phút đọc`
 }
 
+function cleanWixUrl(url: string): string {
+  // Fix duplicate extension: ~mv2.jpg~mv2.jpg → ~mv2.jpg
+  return url.replace(/~mv2\.(jpg|jpeg|png|webp)~mv2\.\w+/gi, '~mv2.$1')
+}
+
 function getImageSrc(value: any, w = 1200, h = 675): string | null {
   if (!value) return null
   const ref = value?.asset?._ref ?? ''
-  // Sanity asset ref format: image-xxxx-WxH-ext
   if (ref.startsWith('image-') && !ref.includes('~mv2') && !ref.includes('.jpg~')) {
     return urlFor(value).width(w).height(h).url()
   }
-  // Wix CDN URL stored directly
-  if (value?.asset?.url) return value.asset.url
-  if (typeof value === 'string' && value.startsWith('http')) return value
+  if (value?.asset?.url) return cleanWixUrl(value.asset.url)
+  if (typeof value === 'string' && value.startsWith('http')) return cleanWixUrl(value)
   return null
 }
 
@@ -128,7 +131,7 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
   const hasRelated = related.length > 0
   const coverSrc = post.mainImage
     ? urlFor(post.mainImage).width(1200).height(675).url()
-    : post.mainImageUrl ?? null
+    : post.mainImageUrl ? cleanWixUrl(post.mainImageUrl) : null
 
   const shareHref = (platform: string) => {
     const url = encodeURIComponent(window.location.href)
@@ -230,7 +233,7 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
               {related.map(p => {
                 const relSrc = p.mainImage
                   ? urlFor(p.mainImage).width(160).height(120).url()
-                  : p.mainImageUrl ?? null
+                  : p.mainImageUrl ? cleanWixUrl(p.mainImageUrl) : null
                 return (
                   <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
                     <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
