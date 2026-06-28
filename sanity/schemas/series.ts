@@ -8,6 +8,13 @@ export default defineType({
     defineField({ name: 'title', title: 'Title', type: 'string', validation: Rule => Rule.required() }),
     defineField({ name: 'slug', title: 'Slug', type: 'slug', options: { source: 'title' } }),
     defineField({ name: 'description', title: 'Description', type: 'text', rows: 3 }),
+    defineField({
+      name: 'sortOrder',
+      title: 'Sort Order',
+      type: 'number',
+      description: 'Lower number appears first. Set 1 for Ẩn Sau Giàn Trống, 2 for Tản Mạn.',
+      initialValue: 99,
+    }),
   ],
   preview: { select: { title: 'title' } },
 })

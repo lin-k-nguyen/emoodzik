@@ -16,7 +16,8 @@ export default function SeriesPage({ params }: { params: Promise<{ slug: string 
   const [visibleCount, setVisibleCount] = useState(PER_PAGE)
 
   useEffect(() => {
-    client.fetch(`*[_type == "series"] | order(title asc) { _id, title, slug }`).then(setSeriesList)
+    client.fetch(`*[_type == "series"] | order(sortOrder asc, title asc) { _id, title, slug }`)
+      .then(setSeriesList)
   }, [])
 
   useEffect(() => {
