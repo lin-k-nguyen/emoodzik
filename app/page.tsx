@@ -7,6 +7,16 @@ import { fmtDate } from '@/lib/data'
 
 export const revalidate = 60
 
+function cleanWixUrl(url: string): string {
+  return url.replace(/~mv2\.(jpg|jpeg|png|webp)~mv2\.\w+/gi, '~mv2.$1')
+}
+
+function getSeriesThumb(p: any): string | null {
+  if (p.mainImage) return urlFor(p.mainImage).width(168).height(128).url()
+  if (p.mainImageUrl) return cleanWixUrl(p.mainImageUrl)
+  return null
+}
+
 export default async function HomePage() {
   const [posts, seriesList] = await Promise.all([
     getAllPosts(),
@@ -57,7 +67,7 @@ export default async function HomePage() {
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {s.posts.map((p: any) => {
-                      const src = p.mainImage ? urlFor(p.mainImage).width(168).height(128).url() : p.mainImageUrl ?? null
+                      const src = getSeriesThumb(p)
                       return (
                         <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
                           <div style={{ position: 'relative', flex: '0 0 84px', width: 84, height: 64, background: 'var(--muted)', overflow: 'hidden' }}>
@@ -103,7 +113,7 @@ export default async function HomePage() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {s.posts.map((p: any) => {
-                    const src = p.mainImage ? urlFor(p.mainImage).width(168).height(128).url() : p.mainImageUrl ?? null
+                    const src = getSeriesThumb(p)
                     return (
                       <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
                         <div style={{ position: 'relative', flex: '0 0 84px', width: 84, height: 64, background: 'var(--muted)', overflow: 'hidden' }}>
