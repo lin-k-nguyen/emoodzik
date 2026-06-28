@@ -30,11 +30,11 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
           Bọn Này
         </Link>
 
-        {/* Desktop: 3 cột | Mobile: stack */}
-        <div style={{ marginTop: 40, display: 'grid', gridTemplateColumns: '260px 1fr 360px', gap: 40, alignItems: 'start' }}>
+        {/* Desktop: 3 cột */}
+        <div className="desk" style={{ marginTop: 40, display: 'grid', gridTemplateColumns: '260px 1fr 360px', gap: 40, alignItems: 'start' }}>
 
           {/* Cột 1: Avatar + tên */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 16 }}>
             <div style={{ position: 'relative', width: 160, height: 160, background: 'var(--muted)', overflow: 'hidden' }}>
               {author.avatar && <Image src={urlFor(author.avatar).width(320).height(320).url()} alt={author.name} fill style={{ objectFit: 'cover' }} />}
             </div>
@@ -81,8 +81,17 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
           </aside>
         </div>
 
-        {/* Mobile: list với load more */}
+        {/* Mobile: avatar + bio + list */}
         <div className="mob" style={{ flexDirection: 'column', marginTop: 40 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 16, marginBottom: 32 }}>
+            <div style={{ position: 'relative', width: 120, height: 120, background: 'var(--muted)', overflow: 'hidden' }}>
+              {author.avatar && <Image src={urlFor(author.avatar).width(240).height(240).url()} alt={author.name} fill style={{ objectFit: 'cover' }} />}
+            </div>
+            <h1 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 700, color: 'var(--fg)' }}>{author.name}</h1>
+            {author.about && author.about.split('\n\n').map((para: string, i: number) => (
+              <p key={i} style={{ margin: 0, fontSize: 15, lineHeight: 1.8, color: 'var(--muted-fg)' }}>{para}</p>
+            ))}
+          </div>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
             <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--fg)' }}>Bài viết</h2>
             <span style={{ fontSize: 14, color: 'var(--muted-fg)' }}>{posts.length} bài</span>
