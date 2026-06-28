@@ -27,7 +27,6 @@ export default function Header({ onSearchOpen }: HeaderProps) {
         borderBottom: '1px solid var(--border)',
         background: 'color-mix(in oklab,var(--bg) 80%,transparent)',
         backdropFilter: 'blur(12px)',
-        paddingTop: 'env(safe-area-inset-top)',
       }}>
         <div style={{
           margin: '0 auto', maxWidth: 1280,
@@ -76,12 +75,11 @@ export default function Header({ onSearchOpen }: HeaderProps) {
 
       {/* Mobile menu — fullscreen overlay */}
       {menuOpen && (
-        <div className="mob" style={{
+        <div className="mob mobile-menu-overlay" style={{
           position: 'fixed', inset: 0, zIndex: 60,
           background: 'var(--bg)',
           flexDirection: 'column',
           overflowY: 'auto',
-          paddingTop: 'env(safe-area-inset-top)',
         }}>
           {/* Header bar inside overlay */}
           <div style={{
