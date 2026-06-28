@@ -10,17 +10,27 @@ export default function ArtistPage({ params }: { params: Promise<{ slug: string 
   const [artist, setArtist] = useState<any>(null)
   const [posts, setPosts] = useState<any[]>([])
   const [visibleCount, setVisibleCount] = useState(28)
+  const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
+    setVisibleCount(28)
     client.fetch(`*[_type == "artist" && slug.current == $slug][0] { _id, name, slug }`, { slug })
-      .then(setArtist)
+      .then(data => {
+        if (!data) setNotFound(true)
+        else setArtist(data)
+      })
     client.fetch(
       `*[_type == "post" && $slug in artists[]->slug.current] | order(publishedAt desc) { _id, title, slug, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title,slug}, author->{name,slug,avatar} }`,
       { slug }
     ).then(setPosts)
   }, [slug])
 
-  if (!artist) return <div style={{ padding: 120, textAlign: 'center', color: 'var(--muted-fg)' }}>Đang tải...</div>
+  if (!artist && !notFound) return <div style={{ padding: 120, textAlign: 'center', color: 'var(--muted-fg)' }}>Đang tải...</div>
+  if (notFound) return (
+    <div style={{ padding: 120, textAlign: 'center', color: 'var(--muted-fg)' }}>
+      Không tìm thấy nghệ sĩ này.
+    </div>
+  )
 
   return (
     <section style={{ margin: '0 auto', maxWidth: 1280, padding: '64px 24px 80px' }}>
