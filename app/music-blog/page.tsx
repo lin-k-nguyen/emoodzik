@@ -39,7 +39,7 @@ export default function MusicBlogPage() {
     <>
       <section style={{ padding: 0 }}>
         <div style={{ position: 'relative', width: '100%', height: 'clamp(200px,28vw,400px)', overflow: 'hidden', borderBottom: '1px solid var(--border)', background: '#000' }}>
-          <Image src="/assets/banner.png" alt="Music Blog" fill style={{ objectFit: 'cover', objectPosition: 'center 42%' }} />
+          <Image src="/assets/music-blog-banner.jpg" alt="Music Blog" fill style={{ objectFit: 'cover', objectPosition: 'center 42%' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(rgba(8,7,6,0) 35%,rgba(8,7,6,.55) 70%,rgba(8,7,6,.9))' }} />
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, margin: '0 auto', maxWidth: 1280, padding: '0 24px 28px', textAlign: 'right' }}>
             <h1 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 'clamp(38px,8vw,76px)', fontWeight: 700, lineHeight: .95, color: '#ff2e2e', textTransform: 'uppercase', textShadow: '0 2px 16px rgba(0,0,0,.85)' }}>Music Blog</h1>
