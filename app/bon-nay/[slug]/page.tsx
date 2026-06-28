@@ -20,7 +20,6 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
 
   return (
     <>
-      {/* Header */}
       <section style={{ borderBottom: '1px solid var(--border)', padding: '64px 24px 48px' }}>
         <div style={{ margin: '0 auto', maxWidth: 1280 }}>
           <Link href="/bon-nay" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--muted-fg)', textDecoration: 'none' }}>
@@ -28,7 +27,6 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
             Bọn Này
           </Link>
 
-          {/* 3 cột: ava+tên | bio | bài viết */}
           <div style={{ marginTop: 40, display: 'grid', gridTemplateColumns: '160px 1fr 380px', gap: 48, alignItems: 'start' }}>
 
             {/* Cột 1: Avatar + tên */}
@@ -42,7 +40,11 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
             {/* Cột 2: Bio */}
             <div style={{ paddingLeft: 8 }}>
               {author.about && (
-                <p style={{ margin: 0, fontSize: 15, lineHeight: 1.8, color: 'var(--muted-fg)' }}>{author.about}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  {author.about.split('\n\n').map((para: string, i: number) => (
+                    <p key={i} style={{ margin: 0, fontSize: 15, lineHeight: 1.8, color: 'var(--muted-fg)' }}>{para}</p>
+                  ))}
+                </div>
               )}
             </div>
 
@@ -75,7 +77,6 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
         </div>
       </section>
 
-      {/* All posts grid */}
       {posts.length > 0 && (
         <section style={{ padding: '48px 24px 80px' }}>
           <div style={{ margin: '0 auto', maxWidth: 1280 }}>
