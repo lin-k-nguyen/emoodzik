@@ -9,6 +9,13 @@ export default defineType({
     defineField({ name: 'slug', title: 'Slug', type: 'slug', options: { source: 'title' } }),
     defineField({ name: 'description', title: 'Description', type: 'text', rows: 3 }),
     defineField({
+      name: 'banner',
+      title: 'Banner Image',
+      type: 'image',
+      options: { hotspot: true },
+      description: 'Overrides the site-wide Series Default Banner for this series.',
+    }),
+    defineField({
       name: 'sortOrder',
       title: 'Sort Order',
       type: 'number',

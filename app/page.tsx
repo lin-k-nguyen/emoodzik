@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { getAllPosts, getAllSeries, urlFor } from '@/lib/sanity'
+import { getAllPosts, getAllSeries, urlFor, client } from '@/lib/sanity'
 import PostCard from '@/components/PostCard'
 import NewsletterSection from '@/components/NewsletterSection'
 import { fmtDate } from '@/lib/data'
@@ -18,9 +18,10 @@ function getSeriesThumb(p: any): string | null {
 }
 
 export default async function HomePage() {
-  const [posts, seriesList] = await Promise.all([
+  const [posts, seriesList, settings] = await Promise.all([
     getAllPosts(),
     getAllSeries(),
+    client.fetch(`*[_type == "siteSettings"][0] { homeBanner }`),
   ])
 
   const latestPosts = posts.slice(0, 6)
@@ -38,7 +39,7 @@ export default async function HomePage() {
       {/* Banner */}
       <section style={{ padding: 0 }}>
         <div style={{ position: 'relative', width: '100%', height: 'clamp(200px,28vw,400px)', overflow: 'hidden', background: 'var(--secondary)' }}>
-          <Image src="/assets/banner.png" alt="EmoodziK Music Blog" fill style={{ objectFit: 'cover', objectPosition: 'left bottom', transform: 'scale(1.38)', transformOrigin: 'left bottom' }} priority />
+          <Image src={settings?.homeBanner ? urlFor(settings.homeBanner).width(1600).height(600).url() : '/assets/banner.png'} alt="EmoodziK Music Blog" fill style={{ objectFit: 'cover', objectPosition: 'left bottom', transform: 'scale(1.38)', transformOrigin: 'left bottom' }} priority />
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '50%', background: 'linear-gradient(to bottom, transparent, var(--bg))' }} />
         </div>
       </section>

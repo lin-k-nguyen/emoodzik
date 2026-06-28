@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react'
 import Image from 'next/image'
-import { client } from '@/lib/sanity'
+import { client, urlFor } from '@/lib/sanity'
 import PostCard from '@/components/PostCard'
 
 const PER_PAGE = 28
@@ -14,10 +14,13 @@ export default function SeriesPage({ params }: { params: Promise<{ slug: string 
   const [posts, setPosts] = useState<any[]>([])
   const [page, setPage] = useState(1)
   const [visibleCount, setVisibleCount] = useState(PER_PAGE)
+  const [defaultBanner, setDefaultBanner] = useState<any>(null)
 
   useEffect(() => {
-    client.fetch(`*[_type == "series"] | order(sortOrder asc, title asc) { _id, title, slug }`)
+    client.fetch(`*[_type == "series"] | order(sortOrder asc, title asc) { _id, title, slug, banner }`)
       .then(setSeriesList)
+    client.fetch(`*[_type == "siteSettings"][0] { seriesBanner }`)
+      .then(s => { if (s?.seriesBanner) setDefaultBanner(s.seriesBanner) })
   }, [])
 
   useEffect(() => {
@@ -30,11 +33,18 @@ export default function SeriesPage({ params }: { params: Promise<{ slug: string 
   const currentPage = Math.min(page, totalPages)
   const pagePosts = posts.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE)
 
+  const activeSeries = seriesList.find(s => s.slug.current === activeTab)
+  const seriesBannerSrc = activeSeries?.banner
+    ? urlFor(activeSeries.banner).width(1600).height(600).url()
+    : defaultBanner
+      ? urlFor(defaultBanner).width(1600).height(600).url()
+      : '/assets/series-banner.jpg'
+
   return (
     <>
       <section style={{ padding: 0 }}>
         <div style={{ position: 'relative', width: '100%', height: 'clamp(200px,28vw,400px)', overflow: 'hidden', borderBottom: '1px solid var(--border)', background: '#000' }}>
-          <Image src="/assets/series-banner.jpg" alt="Series" fill style={{ objectFit: 'cover', objectPosition: 'center 50%' }} />
+          <Image src={seriesBannerSrc} alt="Series" fill style={{ objectFit: 'cover', objectPosition: 'center 50%' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(rgba(8,7,6,0) 35%,rgba(8,7,6,.55) 70%,rgba(8,7,6,.9))' }} />
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, maxWidth: 1280, margin: '0 auto', padding: '0 24px 28px', textAlign: 'right' }}>
             <h1 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 'clamp(38px,8vw,76px)', fontWeight: 700, color: '#ff2e2e', textTransform: 'uppercase', textShadow: '0 2px 16px rgba(0,0,0,.85)' }}>Series</h1>
