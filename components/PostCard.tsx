@@ -16,12 +16,16 @@ export default function PostCard({ post, author, sanity }: PostCardProps) {
   const excerpt = post.excerpt
   const category = sanity ? post.category?.title : post.category
   const date = sanity ? post.publishedAt : post.date
-  const authorName = sanity ? author?.name : author?.name
+  const authorName = author?.name
   const authorAvatar = sanity
     ? (author?.avatar ? urlFor(author.avatar).width(64).height(64).url() : null)
     : author?.avatar
+
+  // Fallback: mainImage → mainImageUrl (Wix CDN)
   const imageUrl = sanity
-    ? (post.mainImage ? urlFor(post.mainImage).width(600).height(400).url() : null)
+    ? (post.mainImage
+        ? urlFor(post.mainImage).width(600).height(400).url()
+        : post.mainImageUrl ?? null)
     : post.image
 
   const fmtDate = (d: string) => {
@@ -34,7 +38,14 @@ export default function PostCard({ post, author, sanity }: PostCardProps) {
       <Link href={href} style={{ display: 'block' }}>
         <div style={{ position: 'relative', aspectRatio: '3/2', width: '100%', overflow: 'hidden', background: 'var(--muted)' }}>
           {imageUrl && (
-            <Image src={imageUrl} alt={title} fill style={{ objectFit: 'cover' }} loading="lazy" />
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              style={{ objectFit: 'cover' }}
+              loading="lazy"
+              unoptimized={!post.mainImage} // skip Next.js optimization for external Wix URLs
+            />
           )}
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '44px 14px 13px', background: 'linear-gradient(to top,rgba(6,5,4,.96),rgba(6,5,4,.55) 55%,rgba(6,5,4,0))' }}>
             <span style={{ fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.14em', color: 'var(--brand)' }}>

@@ -63,6 +63,12 @@ export default defineType({
       options: { hotspot: true },
     }),
     defineField({
+      name: 'mainImageUrl',
+      title: 'Cover Image URL (Wix CDN)',
+      type: 'url',
+      description: 'Temporary: dùng khi chưa upload ảnh lên Sanity.',
+    }),
+    defineField({
       name: 'body',
       title: 'Content',
       type: 'array',

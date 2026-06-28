@@ -14,12 +14,23 @@ export function urlFor(source: any) {
   return builder.image(source)
 }
 
+// Helper: get image URL — fallback to mainImageUrl (Wix CDN) if no mainImage
+export function getImageUrl(post: any, width = 800, height = 450): string | null {
+  if (post?.mainImage) {
+    return urlFor(post.mainImage).width(width).height(height).url()
+  }
+  if (post?.mainImageUrl) {
+    return post.mainImageUrl
+  }
+  return null
+}
+
 // GROQ queries
 export async function getAllPosts() {
   return client.fetch(`
     *[_type == "post"] | order(publishedAt desc) {
       _id, title, slug, excerpt, publishedAt,
-      mainImage, category->{title, slug},
+      mainImage, mainImageUrl, category->{title, slug},
       series->{title, slug},
       author->{name, slug, avatar},
       artists[]->{name, slug},
@@ -32,7 +43,7 @@ export async function getPostBySlug(slug: string) {
   return client.fetch(`
     *[_type == "post" && slug.current == $slug][0] {
       _id, title, slug, excerpt, publishedAt,
-      mainImage, category->{title, slug},
+      mainImage, mainImageUrl, category->{title, slug},
       series->{title, slug},
       author->{name, slug, avatar, about},
       artists[]->{name, slug},
@@ -69,7 +80,7 @@ export async function getPostsByCategory(categorySlug: string) {
   return client.fetch(`
     *[_type == "post" && category->slug.current == $categorySlug] | order(publishedAt desc) {
       _id, title, slug, excerpt, publishedAt,
-      mainImage, category->{title, slug},
+      mainImage, mainImageUrl, category->{title, slug},
       author->{name, slug, avatar}
     }
   `, { categorySlug })
@@ -79,7 +90,7 @@ export async function getPostsBySeries(seriesSlug: string) {
   return client.fetch(`
     *[_type == "post" && series->slug.current == $seriesSlug] | order(publishedAt desc) {
       _id, title, slug, excerpt, publishedAt,
-      mainImage, series->{title, slug},
+      mainImage, mainImageUrl, series->{title, slug},
       author->{name, slug, avatar}
     }
   `, { seriesSlug })
@@ -97,7 +108,7 @@ export async function getPostsByAuthor(authorSlug: string) {
   return client.fetch(`
     *[_type == "post" && author->slug.current == $authorSlug] | order(publishedAt desc) {
       _id, title, slug, excerpt, publishedAt,
-      mainImage, category->{title, slug},
+      mainImage, mainImageUrl, category->{title, slug},
       author->{name, slug, avatar}
     }
   `, { authorSlug })
