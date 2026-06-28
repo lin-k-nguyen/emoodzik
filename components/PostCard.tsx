@@ -15,13 +15,13 @@ function cleanWixUrl(url: string): string {
 }
 
 function getFirstParaText(body: any[]): string {
-  if (!body) return ''
+  if (!Array.isArray(body)) return ''
   const block = body.find((b: any) => b._type === 'block' && b.style === 'normal')
   return block?.children?.map((c: any) => c.text).join('') ?? ''
 }
 
 export default function PostCard({ post, author, sanity }: PostCardProps) {
-  const href = sanity ? `/posts/${post.slug.current}` : `/posts/${post.slug}`
+  const href = sanity ? `/post/${post.slug.current}` : `/post/${post.slug}`
   const title = post.title
   const category = sanity ? post.category?.title : post.category
   const date = sanity ? post.publishedAt : post.date
@@ -30,10 +30,8 @@ export default function PostCard({ post, author, sanity }: PostCardProps) {
     ? (author?.avatar ? urlFor(author.avatar).width(64).height(64).url() : null)
     : author?.avatar
 
-  // Excerpt: use excerpt field or fallback to first paragraph of body
-  const excerpt = post.excerpt || (sanity ? getFirstParaText(post.body) : '')
+  const firstPara = getFirstParaText(post.body)
 
-  // Image: mainImage (Sanity) → mainImageUrl (Wix CDN, cleaned) → null
   const imageUrl = sanity
     ? (post.mainImage
         ? urlFor(post.mainImage).width(600).height(400).url()
@@ -71,9 +69,11 @@ export default function PostCard({ post, author, sanity }: PostCardProps) {
         <h2 style={{ marginTop: 0, fontFamily: 'var(--font-serif)', fontSize: 21, fontWeight: 600, lineHeight: 1.28, letterSpacing: '-.01em', color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden', minHeight: '2.56em' }}>
           <Link href={href} style={{ color: 'inherit', textDecoration: 'none' }}>{title}</Link>
         </h2>
-        <p style={{ marginTop: 6, fontSize: 14, lineHeight: 1.6, color: 'var(--muted-fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden', height: '4.8em' }}>
-          {excerpt}
-        </p>
+        {firstPara && (
+          <p style={{ marginTop: 6, fontSize: 14, lineHeight: 1.6, color: 'var(--muted-fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden', height: '4.8em' }}>
+            {firstPara}
+          </p>
+        )}
         <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 12 }}>
           {authorAvatar && (
             <Image src={authorAvatar} alt={authorName ?? ''} width={32} height={32} style={{ borderRadius: '9999px', objectFit: 'cover', flex: 'none' }} />
