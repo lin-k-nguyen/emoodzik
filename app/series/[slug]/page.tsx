@@ -19,7 +19,7 @@ export default function SeriesPage({ params }: { params: Promise<{ slug: string 
   }, [])
 
   useEffect(() => {
-    client.fetch(`*[_type == "post" && series->slug.current == $slug] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, series->{title,slug}, author->{name,slug,avatar} }`, { slug: activeTab })
+    client.fetch(`*[_type == "post" && series->slug.current == $slug] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, series->{title,slug}, author->{name,slug,avatar} }`, { slug: activeTab })
       .then(setPosts)
   }, [activeTab])
 

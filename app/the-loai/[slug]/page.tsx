@@ -16,11 +16,11 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
   useEffect(() => {
     if (slug === 'all') {
       setCat({ title: 'Tất tần tật', slug: { current: 'all' } })
-      client.fetch(`*[_type == "post"] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, category->{title,slug}, author->{name,slug,avatar} }`)
+      client.fetch(`*[_type == "post"] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title,slug}, author->{name,slug,avatar} }`)
         .then(setPosts)
     } else {
       client.fetch(`*[_type == "category" && slug.current == $slug][0] { title, slug, description }`, { slug }).then(setCat)
-      client.fetch(`*[_type == "post" && category->slug.current == $slug] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, category->{title,slug}, author->{name,slug,avatar} }`, { slug })
+      client.fetch(`*[_type == "post" && category->slug.current == $slug] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title,slug}, author->{name,slug,avatar} }`, { slug })
         .then(setPosts)
     }
   }, [slug])

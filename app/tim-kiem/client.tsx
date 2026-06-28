@@ -13,7 +13,7 @@ export default function TimKiemClient() {
   const [allPosts, setAllPosts] = useState<any[]>([])
 
   useEffect(() => {
-    client.fetch(`*[_type == "post"] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, category->{title,slug}, author->{name,slug,avatar}, artists[]->{name} }`)
+    client.fetch(`*[_type == "post"] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title,slug}, author->{name,slug,avatar}, artists[]->{name} }`)
       .then(setAllPosts)
   }, [])
 

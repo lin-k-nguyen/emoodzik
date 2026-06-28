@@ -21,8 +21,8 @@ export default function MusicBlogPage() {
   useEffect(() => {
     setLoading(true)
     const query = activeCat === 'all'
-      ? `*[_type == "post"] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, category->{title, slug}, author->{name, slug, avatar} }`
-      : `*[_type == "post" && category->slug.current == $cat] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, category->{title, slug}, author->{name, slug, avatar} }`
+      ? `*[_type == "post"] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title, slug}, author->{name, slug, avatar} }`
+      : `*[_type == "post" && category->slug.current == $cat] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title, slug}, author->{name, slug, avatar} }`
     client.fetch(query, { cat: activeCat }).then(data => {
       setPosts(data)
       setLoading(false)

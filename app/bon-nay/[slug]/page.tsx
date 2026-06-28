@@ -13,7 +13,7 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
 
   useEffect(() => {
     client.fetch(`*[_type == "author" && slug.current == $slug][0] { _id, name, slug, avatar, about }`, { slug }).then(setAuthor)
-    client.fetch(`*[_type == "post" && author->slug.current == $slug] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, category->{title,slug} }`, { slug }).then(setPosts)
+    client.fetch(`*[_type == "post" && author->slug.current == $slug] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title,slug} }`, { slug }).then(setPosts)
   }, [slug])
 
   if (!author) return <div style={{ padding: 120, textAlign: 'center', color: 'var(--muted-fg)' }}>Đang tải...</div>
