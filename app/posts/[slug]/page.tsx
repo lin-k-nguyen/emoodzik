@@ -106,6 +106,7 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
   if (!post) return <div style={{ padding: 120, textAlign: 'center', color: 'var(--muted-fg)' }}>Không tìm thấy bài viết.</div>
 
   const readingTime = calcReadingTime(post.body)
+  const hasRelated = related.length > 0
 
   const shareHref = (platform: string) => {
     const url = encodeURIComponent(window.location.href)
@@ -118,7 +119,15 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
 
   return (
     <>
-      <div style={{ margin: '0 auto', maxWidth: 1280, padding: '64px 24px 96px', display: 'grid', gridTemplateColumns: related.length > 0 ? '1fr 320px' : '1fr', gap: 64, alignItems: 'start' }}>
+      <div style={{
+        margin: '0 auto',
+        maxWidth: hasRelated ? 1280 : 768,
+        padding: '64px 24px 96px',
+        display: hasRelated ? 'grid' : 'block',
+        gridTemplateColumns: hasRelated ? '1fr 320px' : undefined,
+        gap: hasRelated ? 64 : undefined,
+        alignItems: 'start',
+      }}>
 
         {/* Main article */}
         <article>
@@ -192,7 +201,7 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
         </article>
 
         {/* Right sidebar - Đọc tiếp */}
-        {related.length > 0 && (
+        {hasRelated && (
           <aside style={{ borderLeft: '1px solid var(--border)', paddingLeft: 40, position: 'sticky', top: 88 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
               <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 20, color: 'var(--fg)' }}>Đọc tiếp</h2>
