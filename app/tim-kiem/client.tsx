@@ -5,12 +5,24 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { client } from '@/lib/sanity'
 import PostCard from '@/components/PostCard'
 
+function norm(s: string): string {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/đ/gi, 'd')
+}
+
+const PER_PAGE = 28
+
 export default function TimKiemClient() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const initial = searchParams.get('q') ?? ''
   const [query, setQuery] = useState(initial)
   const [allPosts, setAllPosts] = useState<any[]>([])
+  const [visibleCount, setVisibleCount] = useState(PER_PAGE)
+
+  useEffect(() => {
+    const q = searchParams.get('q') ?? ''
+    setQuery(q)
+  }, [searchParams])
 
   useEffect(() => {
     client.fetch(`*[_type == "post"] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title,slug}, author->{name,slug,avatar}, artists[]->{name} }`)
@@ -18,13 +30,15 @@ export default function TimKiemClient() {
   }, [])
 
   const results = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const q = norm(query.trim())
     if (!q) return []
     return allPosts.filter(p => {
       const artistNames = p.artists?.map((a: any) => a.name).join(' ') ?? ''
-      return [p.title, p.excerpt, p.category?.title, p.author?.name, artistNames].join(' ').toLowerCase().includes(q)
+      return norm([p.title, p.category?.title, p.author?.name, artistNames].join(' ')).includes(q)
     })
   }, [query, allPosts])
+
+  useEffect(() => { setVisibleCount(PER_PAGE) }, [query])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,9 +61,16 @@ export default function TimKiemClient() {
         {query.trim() ? `${results.length} kết quả cho "${query.trim()}"` : ''}
       </p>
       {results.length > 0 ? (
-        <div className="grid-4" style={{ paddingTop: 40 }}>
-          {results.map(p => <PostCard key={p._id} post={p} author={p.author} sanity />)}
-        </div>
+        <>
+          <div className="grid-4" style={{ paddingTop: 40 }}>
+            {results.slice(0, visibleCount).map(p => <PostCard key={p._id} post={p} author={p.author} sanity />)}
+          </div>
+          {visibleCount < results.length && (
+            <button onClick={() => setVisibleCount(v => v + PER_PAGE)} style={{ marginTop: 32, width: '100%', height: 52, border: '1px solid var(--border)', background: 'none', color: 'var(--fg)', fontSize: 15, fontFamily: 'inherit', cursor: 'pointer', fontWeight: 500 }}>
+              Xem thêm
+            </button>
+          )}
+        </>
       ) : query.trim() ? (
         <p style={{ marginTop: 64, textAlign: 'center', fontSize: 15, color: 'var(--muted-fg)' }}>Không tìm thấy kết quả cho &ldquo;{query}&rdquo;.</p>
       ) : null}

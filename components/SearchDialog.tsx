@@ -10,6 +10,14 @@ interface SearchDialogProps {
   onClose: () => void
 }
 
+function norm(s: string): string {
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/đ/gi, 'd')
+}
+
+function cleanWixUrl(url: string): string {
+  return url.replace(/~mv2\.(jpg|jpeg|png|webp)~mv2\.\w+/gi, '~mv2.$1')
+}
+
 export default function SearchDialog({ onClose }: SearchDialogProps) {
   const [query, setQuery] = useState('')
   const [allPosts, setAllPosts] = useState<any[]>([])
@@ -25,7 +33,7 @@ export default function SearchDialog({ onClose }: SearchDialogProps) {
 
   useEffect(() => {
     client.fetch(`*[_type == "post"] | order(publishedAt desc) {
-      _id, title, slug, excerpt, mainImage,
+      _id, title, slug, excerpt, mainImage, mainImageUrl,
       category->{title, slug},
       author->{name},
       artists[]->{name}
@@ -33,12 +41,11 @@ export default function SearchDialog({ onClose }: SearchDialogProps) {
   }, [])
 
   const results = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const q = norm(query.trim())
     if (!q) return []
     return allPosts.filter(p => {
       const artists = p.artists?.map((a: any) => a.name).join(' ') ?? ''
-      return [p.title, p.excerpt, p.category?.title, p.author?.name, artists]
-        .join(' ').toLowerCase().includes(q)
+      return norm([p.title, p.excerpt, p.category?.title, p.author?.name, artists].join(' ')).includes(q)
     })
   }, [query, allPosts])
 
@@ -54,7 +61,7 @@ export default function SearchDialog({ onClose }: SearchDialogProps) {
 
   return (
     <div role="dialog" aria-modal="true" style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 16 }}>
-      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'color-mix(in oklab,var(--fg) 40%,transparent)', backdropFilter: 'blur(4px)' }} />
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(2px)' }} />
       <div style={{ position: 'relative', marginTop: '8vh', width: '100%', maxWidth: 576, overflow: 'hidden', border: '1px solid var(--border)', background: 'var(--bg)', boxShadow: '0 30px 60px rgba(0,0,0,.35)' }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--border)', padding: '0 16px' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flex: 'none', color: 'var(--muted-fg)' }}>
@@ -80,7 +87,12 @@ export default function SearchDialog({ onClose }: SearchDialogProps) {
                 <li key={p._id}>
                   <Link href={`/post/${p.slug.current}`} onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 14px', textDecoration: 'none' }}>
                     <div style={{ position: 'relative', width: 56, height: 56, flex: 'none', overflow: 'hidden', background: 'var(--secondary)' }}>
-                      {p.mainImage && <Image src={urlFor(p.mainImage).width(112).height(112).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
+                      {(() => {
+                        const thumbSrc = p.mainImage
+                          ? urlFor(p.mainImage).width(112).height(112).url()
+                          : p.mainImageUrl ? cleanWixUrl(p.mainImageUrl) : null
+                        return thumbSrc ? <Image src={thumbSrc} alt={p.title} fill style={{ objectFit: 'cover' }} unoptimized={!p.mainImage} /> : null
+                      })()}
                     </div>
                     <div style={{ minWidth: 0 }}>
                       <p style={{ margin: 0, fontSize: 12, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--brand)' }}>{p.category?.title}</p>
