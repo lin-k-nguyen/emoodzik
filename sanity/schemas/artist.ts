@@ -7,8 +7,6 @@ export default defineType({
   fields: [
     defineField({ name: 'name', title: 'Name', type: 'string', validation: Rule => Rule.required() }),
     defineField({ name: 'slug', title: 'Slug', type: 'slug', options: { source: 'name' } }),
-    defineField({ name: 'bio', title: 'Bio', type: 'text', rows: 3 }),
-    defineField({ name: 'photo', title: 'Photo', type: 'image', options: { hotspot: true } }),
   ],
-  preview: { select: { title: 'name', media: 'photo' } },
+  preview: { select: { title: 'name' } },
 })
