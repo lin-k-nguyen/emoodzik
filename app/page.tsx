@@ -37,8 +37,9 @@ export default async function HomePage() {
     <>
       {/* Banner */}
       <section style={{ padding: 0 }}>
-        <div style={{ position: 'relative', width: '100%', height: 'clamp(200px,28vw,400px)', overflow: 'hidden', borderBottom: '1px solid var(--border)', background: 'var(--secondary)' }}>
+        <div style={{ position: 'relative', width: '100%', height: 'clamp(200px,28vw,400px)', overflow: 'hidden', background: 'var(--secondary)' }}>
           <Image src="/assets/banner.png" alt="EmoodziK Music Blog" fill style={{ objectFit: 'cover', objectPosition: 'left bottom', transform: 'scale(1.38)', transformOrigin: 'left bottom' }} priority />
+          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '50%', background: 'linear-gradient(to bottom, transparent, var(--bg))' }} />
         </div>
       </section>
 
