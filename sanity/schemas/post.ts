@@ -33,27 +33,21 @@ export default defineType({
     defineField({
       name: 'category',
       title: 'Category',
-      type: 'string',
-      options: {
-        list: ['Tổng Hợp', 'Quen Quen', 'Lạ Lạ', 'Ăn Bum', 'Ăn View'],
-      },
+      type: 'reference',
+      to: [{ type: 'category' }],
     }),
     defineField({
       name: 'series',
       title: 'Series',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Ẩn Sau Giàn Trống', value: 'an-sau-gian-trong' },
-          { title: 'Tản Mạn', value: 'tan-man' },
-        ],
-      },
+      type: 'reference',
+      to: [{ type: 'series' }],
     }),
     defineField({
       name: 'artists',
       title: 'Artists Mentioned',
       type: 'array',
-      of: [{ type: 'string' }],
+      of: [{ type: 'reference', to: [{ type: 'artist' }] }],
+      description: 'Search existing artists or create new ones inline.',
     }),
     defineField({
       name: 'excerpt',
