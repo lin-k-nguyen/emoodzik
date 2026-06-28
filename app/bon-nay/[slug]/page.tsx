@@ -56,7 +56,7 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
             </div>
             <div style={{ maxHeight: 900, overflowY: 'auto', scrollbarWidth: 'none' }}>
               {posts.map(p => (
-                <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
+                <Link key={p._id} href={`/post/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
                   <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
                     {p.mainImage && <Image src={urlFor(p.mainImage).width(160).height(120).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
                   </div>
@@ -80,7 +80,7 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {posts.slice(0, mobileLimit).map(p => (
-              <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
+              <Link key={p._id} href={`/post/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
                 <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
                   {p.mainImage && <Image src={urlFor(p.mainImage).width(160).height(120).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
                 </div>

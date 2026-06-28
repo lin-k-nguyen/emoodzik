@@ -78,7 +78,7 @@ export default function SearchDialog({ onClose }: SearchDialogProps) {
             <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
               {results.slice(0, 6).map(p => (
                 <li key={p._id}>
-                  <Link href={`/posts/${p.slug.current}`} onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 14px', textDecoration: 'none' }}>
+                  <Link href={`/post/${p.slug.current}`} onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 14px', textDecoration: 'none' }}>
                     <div style={{ position: 'relative', width: 56, height: 56, flex: 'none', overflow: 'hidden', background: 'var(--secondary)' }}>
                       {p.mainImage && <Image src={urlFor(p.mainImage).width(112).height(112).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
                     </div>

@@ -70,7 +70,7 @@ export default async function HomePage() {
                     {s.posts.map((p: any) => {
                       const src = getSeriesThumb(p)
                       return (
-                        <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
+                        <Link key={p._id} href={`/post/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
                           <div style={{ position: 'relative', flex: '0 0 84px', width: 84, height: 64, background: 'var(--muted)', overflow: 'hidden' }}>
                             {src && <Image src={src} alt={p.title} fill style={{ objectFit: 'cover' }} unoptimized={!p.mainImage} />}
                           </div>
@@ -116,7 +116,7 @@ export default async function HomePage() {
                   {s.posts.map((p: any) => {
                     const src = getSeriesThumb(p)
                     return (
-                      <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
+                      <Link key={p._id} href={`/post/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
                         <div style={{ position: 'relative', flex: '0 0 84px', width: 84, height: 64, background: 'var(--muted)', overflow: 'hidden' }}>
                           {src && <Image src={src} alt={p.title} fill style={{ objectFit: 'cover' }} unoptimized={!p.mainImage} />}
                         </div>
