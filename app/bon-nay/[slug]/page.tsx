@@ -5,6 +5,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { client, urlFor } from '@/lib/sanity'
 
+function cleanWixUrl(url: string): string {
+  return url.replace(/~mv2\.(jpg|jpeg|png|webp)~mv2\.\w+/gi, '~mv2.$1')
+}
+
 export default function AuthorPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
   const [author, setAuthor] = useState<any>(null)
@@ -27,7 +31,7 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
         </Link>
 
         {/* Desktop: 3 cột | Mobile: stack */}
-        <div style={{ marginTop: 40, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 40, alignItems: 'start' }}>
+        <div style={{ marginTop: 40, display: 'grid', gridTemplateColumns: '260px 1fr 360px', gap: 40, alignItems: 'start' }}>
 
           {/* Cột 1: Avatar + tên */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
@@ -55,19 +59,24 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
               <span style={{ fontSize: 14, color: 'var(--muted-fg)' }}>{posts.length} bài</span>
             </div>
             <div style={{ maxHeight: 900, overflowY: 'auto', scrollbarWidth: 'none' }}>
-              {posts.map(p => (
-                <Link key={p._id} href={`/post/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
-                  <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
-                    {p.mainImage && <Image src={urlFor(p.mainImage).width(160).height(120).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
-                  </div>
-                  <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-                    <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
-                      {p.title}
-                    </h3>
-                    <p style={{ margin: 'auto 0 0', fontSize: 12, color: 'var(--muted-fg)' }}>{p.category?.title}</p>
-                  </div>
-                </Link>
-              ))}
+              {posts.map(p => {
+                const src = p.mainImage
+                  ? urlFor(p.mainImage).width(160).height(120).url()
+                  : p.mainImageUrl ? cleanWixUrl(p.mainImageUrl) : null
+                return (
+                  <Link key={p._id} href={`/post/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
+                    <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
+                      {src && <Image src={src} alt={p.title} fill style={{ objectFit: 'cover' }} unoptimized={!p.mainImage} />}
+                    </div>
+                    <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+                      <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
+                        {p.title}
+                      </h3>
+                      <p style={{ margin: 'auto 0 0', fontSize: 12, color: 'var(--muted-fg)' }}>{p.category?.title}</p>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           </aside>
         </div>
@@ -79,23 +88,28 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
             <span style={{ fontSize: 14, color: 'var(--muted-fg)' }}>{posts.length} bài</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {posts.slice(0, mobileLimit).map(p => (
-              <Link key={p._id} href={`/post/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
-                <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
-                  {p.mainImage && <Image src={urlFor(p.mainImage).width(160).height(120).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
-                </div>
-                <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-                  <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
-                    {p.title}
-                  </h3>
-                  <p style={{ margin: 'auto 0 0', fontSize: 12, color: 'var(--muted-fg)' }}>{p.category?.title}</p>
-                </div>
-              </Link>
-            ))}
+            {posts.slice(0, mobileLimit).map(p => {
+              const src = p.mainImage
+                ? urlFor(p.mainImage).width(160).height(120).url()
+                : p.mainImageUrl ? cleanWixUrl(p.mainImageUrl) : null
+              return (
+                <Link key={p._id} href={`/post/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
+                  <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
+                    {src && <Image src={src} alt={p.title} fill style={{ objectFit: 'cover' }} unoptimized={!p.mainImage} />}
+                  </div>
+                  <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+                    <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
+                      {p.title}
+                    </h3>
+                    <p style={{ margin: 'auto 0 0', fontSize: 12, color: 'var(--muted-fg)' }}>{p.category?.title}</p>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
           {mobileLimit < posts.length && (
             <button onClick={() => setMobileLimit(l => l + 20)} style={{ marginTop: 24, width: '100%', height: 48, border: '1px solid var(--border)', background: 'none', color: 'var(--fg)', fontSize: 15, fontFamily: 'inherit', cursor: 'pointer' }}>
-              Xem thêm ({posts.length - mobileLimit} bài còn lại)
+              Xem thêm
             </button>
           )}
         </div>

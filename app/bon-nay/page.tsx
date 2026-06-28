@@ -7,11 +7,13 @@ import { client, urlFor } from '@/lib/sanity'
 
 export default function BonNayPage() {
   const [authors, setAuthors] = useState<any[]>([])
+  const [settings, setSettings] = useState<any>(null)
   const [contactSent, setContactSent] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', message: '' })
 
   useEffect(() => {
     client.fetch(`*[_type == "author"] { _id, name, slug, avatar, about }`).then(setAuthors)
+    client.fetch('*[_type == "siteSettings"][0] { bonNayIntro }').then(setSettings)
   }, [])
 
   const handleContact = (e: React.FormEvent) => {
@@ -26,8 +28,16 @@ export default function BonNayPage() {
           <p style={{ margin: 0, fontSize: 14, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.15em', color: 'var(--accent)' }}>Every Thursday &amp; Sunday</p>
           <h1 style={{ margin: '12px 0 0', fontFamily: 'var(--font-serif)', fontSize: 'clamp(30px,6.5vw,48px)', fontWeight: 600, color: 'var(--fg)' }}>Bọn Này</h1>
           <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <p style={{ margin: 0, fontSize: 19, lineHeight: 1.7, color: 'var(--fg)' }}>Bọn này là những thằng quen và chơi với nhau từ rất nhiều năm vì cùng chia sẻ một sở thích: nghe nhạc. Lớn lên trong những năm 90 ở Hà Nội hồi đó, có lẽ đa số những thứ đi đến được đôi tai đều có nguồn gốc từ đĩa CD Tàu.</p>
-            <p style={{ margin: 0, lineHeight: 1.75, color: 'var(--muted-fg)' }}>Bọn này viết lách tào lao trên trang này với mục đích thuần túy chia sẻ sở thích nghe nhạc và mấy thứ lượm lặt chỗ này chỗ kia với mọi người. Bọn này chỉ kể chuyện thôi nhé, đừng quan trọng đúng hay sai.</p>
+            {settings?.bonNayIntro?.length > 0 ? (
+              settings.bonNayIntro.map((para: string, i: number) => (
+                <p key={i} style={{ margin: 0, fontSize: 19, lineHeight: 1.7, color: i === 0 ? 'var(--fg)' : 'var(--muted-fg)' }}>{para}</p>
+              ))
+            ) : (
+              <>
+                <p style={{ margin: 0, fontSize: 19, lineHeight: 1.7, color: 'var(--fg)' }}>Bọn này là những thằng quen và chơi với nhau từ rất nhiều năm vì cùng chia sẻ một sở thích: nghe nhạc.</p>
+                <p style={{ margin: 0, lineHeight: 1.75, color: 'var(--muted-fg)' }}>Bọn này viết lách tào lao trên trang này với mục đích thuần túy chia sẻ sở thích nghe nhạc và mấy thứ lượm lặt chỗ này chỗ kia với mọi người. Bọn này chỉ kể chuyện thôi nhé, đừng quan trọng đúng hay sai.</p>
+              </>
+            )}
             <p style={{ margin: '8px 0 0', fontSize: 14, color: 'var(--muted-fg)' }}>Topic thường được bốt vào thứ 5 và Chúa nhật.</p>
           </div>
         </div>

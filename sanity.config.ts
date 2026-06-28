@@ -5,6 +5,7 @@ import author from './sanity/schemas/author'
 import artist from './sanity/schemas/artist'
 import series from './sanity/schemas/series'
 import category from './sanity/schemas/category'
+import siteSettings from './sanity/schemas/siteSettings'
 
 export default defineConfig({
   name: 'default',
@@ -13,6 +14,6 @@ export default defineConfig({
   dataset: 'production',
   plugins: [structureTool()],
   schema: {
-    types: [post, author, artist, series, category],
+    types: [post, author, artist, series, category, siteSettings],
   },
 })
