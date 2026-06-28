@@ -33,7 +33,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body>
-        <Header onSearchOpen={() => setSearchOpen(true)} />
+        <Header
+          onSearchOpen={() => setSearchOpen(true)}
+          theme={theme}
+          onThemeToggle={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+        />
         <main style={{ flex: 1 }}>{children}</main>
         <Footer />
         {searchOpen && <SearchDialog onClose={() => setSearchOpen(false)} />}
