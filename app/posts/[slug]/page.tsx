@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { client, urlFor } from '@/lib/sanity'
+import { PortableText } from '@portabletext/react'
 import PostCard from '@/components/PostCard'
 
 function fmtDate(d: string) {
@@ -17,6 +18,48 @@ function calcReadingTime(body: any[]): string {
     .map((b: any) => b.children?.map((c: any) => c.text).join('') ?? '').join(' ')
   const words = text.split(/\s+/).filter(Boolean).length
   return `${Math.max(1, Math.ceil(words / 200))} phút đọc`
+}
+
+const portableTextComponents = {
+  block: {
+    normal: ({ children }: any) => (
+      <p style={{ margin: '0 0 24px', fontSize: 18, lineHeight: 1.8, color: 'color-mix(in oklab,var(--fg) 90%,transparent)' }}>
+        {children}
+      </p>
+    ),
+    h2: ({ children }: any) => (
+      <h2 style={{ margin: '48px 0 16px', fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 700, color: 'var(--fg)' }}>{children}</h2>
+    ),
+    h3: ({ children }: any) => (
+      <h3 style={{ margin: '32px 0 12px', fontFamily: 'var(--font-serif)', fontSize: 22, fontWeight: 600, color: 'var(--fg)' }}>{children}</h3>
+    ),
+    blockquote: ({ children }: any) => (
+      <blockquote style={{ margin: '32px 0', borderLeft: '3px solid var(--brand)', paddingLeft: 24, fontStyle: 'italic', color: 'var(--muted-fg)', fontSize: 18 }}>{children}</blockquote>
+    ),
+  },
+  marks: {
+    strong: ({ children }: any) => <strong style={{ fontWeight: 700, color: 'var(--fg)' }}>{children}</strong>,
+    em: ({ children }: any) => <em>{children}</em>,
+    link: ({ value, children }: any) => (
+      <a href={value?.href} target="_blank" rel="noreferrer" style={{ color: 'var(--brand)', textDecoration: 'underline' }}>{children}</a>
+    ),
+  },
+  types: {
+    image: ({ value }: any) => (
+      <div style={{ margin: '32px 0', position: 'relative', width: '100%', aspectRatio: '16/9' }}>
+        <Image src={urlFor(value).width(1200).height(675).url()} alt={value.caption ?? ''} fill style={{ objectFit: 'cover' }} />
+        {value.caption && <p style={{ marginTop: 8, fontSize: 13, color: 'var(--muted-fg)', textAlign: 'center' }}>{value.caption}</p>}
+      </div>
+    ),
+    youtube: ({ value }: any) => {
+      const videoId = value.url?.split('v=')[1]?.split('&')[0] ?? value.url?.split('/').pop()
+      return (
+        <div style={{ margin: '32px 0', position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+          <iframe src={`https://www.youtube.com/embed/${videoId}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }} allowFullScreen />
+        </div>
+      )
+    },
+  },
 }
 
 export default function PostPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -103,29 +146,7 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
         )}
 
         <div style={{ marginTop: 48 }}>
-          {post.body?.map((block: any, i: number) => {
-            if (block._type === 'block') {
-              const text = block.children?.map((c: any) => c.text).join('') ?? ''
-              return <p key={block._key} className={i === 0 ? 'dropcap' : ''} style={{ margin: '0 0 24px', fontSize: 18, lineHeight: 1.8, color: 'color-mix(in oklab,var(--fg) 90%,transparent)' }}>{text}</p>
-            }
-            if (block._type === 'image') {
-              return (
-                <div key={block._key} style={{ margin: '32px 0', position: 'relative', width: '100%', aspectRatio: '16/9' }}>
-                  <Image src={urlFor(block).width(1200).height(675).url()} alt={block.caption ?? ''} fill style={{ objectFit: 'cover' }} />
-                  {block.caption && <p style={{ marginTop: 8, fontSize: 13, color: 'var(--muted-fg)', textAlign: 'center' }}>{block.caption}</p>}
-                </div>
-              )
-            }
-            if (block._type === 'youtube') {
-              const videoId = block.url?.split('v=')[1]?.split('&')[0] ?? block.url?.split('/').pop()
-              return (
-                <div key={block._key} style={{ margin: '32px 0', position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-                  <iframe src={`https://www.youtube.com/embed/${videoId}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }} allowFullScreen />
-                </div>
-              )
-            }
-            return null
-          })}
+          <PortableText value={post.body} components={portableTextComponents} />
         </div>
 
         {post.artists?.length > 0 && (
