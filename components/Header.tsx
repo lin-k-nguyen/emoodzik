@@ -11,7 +11,6 @@ interface HeaderProps {
 export default function Header({ onSearchOpen }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false)
 
-  // Prevent body scroll when menu open
   useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = 'hidden'
@@ -28,6 +27,7 @@ export default function Header({ onSearchOpen }: HeaderProps) {
         borderBottom: '1px solid var(--border)',
         background: 'color-mix(in oklab,var(--bg) 80%,transparent)',
         backdropFilter: 'blur(12px)',
+        paddingTop: 'env(safe-area-inset-top)',
       }}>
         <div style={{
           margin: '0 auto', maxWidth: 1280,
@@ -35,7 +35,6 @@ export default function Header({ onSearchOpen }: HeaderProps) {
           alignItems: 'center', justifyContent: 'space-between',
           gap: 16, padding: '0 24px',
         }}>
-          {/* Logo */}
           <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em', color: 'var(--fg)', textDecoration: 'none' }}>
             Emoodzi<span style={{ color: 'var(--brand)' }}>K</span>
           </Link>
@@ -82,7 +81,6 @@ export default function Header({ onSearchOpen }: HeaderProps) {
           background: 'var(--bg)',
           flexDirection: 'column',
           overflowY: 'auto',
-          // Safe area for iPhone notch/dynamic island
           paddingTop: 'env(safe-area-inset-top)',
         }}>
           {/* Header bar inside overlay */}
@@ -117,7 +115,7 @@ export default function Header({ onSearchOpen }: HeaderProps) {
               </Link>
             ))}
 
-            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
               <Link href="/nghe-si" onClick={() => setMenuOpen(false)}
                 style={{ padding: '12px 0', fontSize: 18, fontFamily: 'var(--font-serif)', fontWeight: 500, color: 'var(--fg)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
                 Nghệ Sĩ
