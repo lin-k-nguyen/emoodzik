@@ -1,15 +1,27 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { getAllPosts, getAuthor, SERIES, fmtDate } from '@/lib/data'
+import { getAllPosts, getAllSeries, urlFor } from '@/lib/sanity'
 import PostCard from '@/components/PostCard'
 import NewsletterSection from '@/components/NewsletterSection'
+import { fmtDate } from '@/lib/data'
 
-export default function HomePage() {
-  const latestPosts = getAllPosts().slice(0, 6)
-  const homeSeries = SERIES.map(s => ({
-    ...s,
-    posts: getAllPosts().filter(p => p.series === s.slug).slice(0, 5),
-  }))
+export const revalidate = 60
+
+export default async function HomePage() {
+  const [posts, seriesList] = await Promise.all([
+    getAllPosts(),
+    getAllSeries(),
+  ])
+
+  const latestPosts = posts.slice(0, 6)
+
+  const homeSeries = await Promise.all(
+    seriesList.map(async (s: any) => {
+      const { getPostsBySeries } = await import('@/lib/sanity')
+      const seriesPosts = await getPostsBySeries(s.slug.current)
+      return { ...s, posts: seriesPosts.slice(0, 5) }
+    })
+  )
 
   return (
     <>
@@ -33,39 +45,35 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="grid-2" style={{ paddingTop: 40 }}>
-              {latestPosts.map(p => {
-                const author = getAuthor(p.author)!
-                return <PostCard key={p.slug} post={p} author={author} />
-              })}
+              {latestPosts.map((p: any) => (
+                <PostCard key={p._id} post={p} author={p.author} sanity />
+              ))}
             </div>
           </div>
 
           {/* Series sidebar */}
           <aside style={{ borderLeft: '1px solid var(--border)', paddingLeft: 40, display: 'flex', flexDirection: 'column' }}>
-            {homeSeries.map((s, i) => (
-              <section key={s.slug} style={i > 0 ? { marginTop: 48, paddingTop: 48, borderTop: '1px solid var(--border)' } : {}}>
-                <Link href={`/series/${s.slug}`} style={{ display: 'inline-block', textDecoration: 'none' }}>
-                  <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--fg)' }}>{s.label}</h2>
+            {homeSeries.map((s: any, i: number) => (
+              <section key={s._id} style={i > 0 ? { marginTop: 48, paddingTop: 48, borderTop: '1px solid var(--border)' } : {}}>
+                <Link href={`/series/${s.slug.current}`} style={{ display: 'inline-block', textDecoration: 'none' }}>
+                  <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--fg)' }}>{s.title}</h2>
                 </Link>
                 <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column' }}>
-                  {s.posts.map(p => {
-                    const author = getAuthor(p.author)!
-                    return (
-                      <Link key={p.slug} href={`/posts/${p.slug}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
-                        <div style={{ position: 'relative', flex: '0 0 84px', width: 84, height: 64, background: 'var(--muted)', overflow: 'hidden' }}>
-                          <Image src={p.image} alt={p.title} fill style={{ objectFit: 'cover' }} />
-                        </div>
-                        <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-                          <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 15, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
-                            {p.title}
-                          </h3>
-                          <p style={{ margin: 'auto 0 0', fontSize: 12, color: 'var(--muted-fg)' }}>{fmtDate(p.date)} · {p.readingTime}</p>
-                        </div>
-                      </Link>
-                    )
-                  })}
+                  {s.posts.map((p: any) => (
+                    <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
+                      <div style={{ position: 'relative', flex: '0 0 84px', width: 84, height: 64, background: 'var(--muted)', overflow: 'hidden' }}>
+                        {p.mainImage && <Image src={urlFor(p.mainImage).width(168).height(128).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
+                      </div>
+                      <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+                        <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 15, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
+                          {p.title}
+                        </h3>
+                        <p style={{ margin: 'auto 0 0', fontSize: 12, color: 'var(--muted-fg)' }}>{fmtDate(p.publishedAt)}</p>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-                <Link href={`/series/${s.slug}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, fontSize: 13, fontWeight: 500, color: 'var(--brand)', textDecoration: 'none' }}>
+                <Link href={`/series/${s.slug.current}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 16, fontSize: 13, fontWeight: 500, color: 'var(--brand)', textDecoration: 'none' }}>
                   Xem chuyên đề
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </Link>
