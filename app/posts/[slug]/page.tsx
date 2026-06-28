@@ -20,7 +20,6 @@ function calcReadingTime(body: any[]): string {
 }
 
 function cleanWixUrl(url: string): string {
-  // Fix duplicate extension: ~mv2.jpg~mv2.jpg → ~mv2.jpg
   return url.replace(/~mv2\.(jpg|jpeg|png|webp)~mv2\.\w+/gi, '~mv2.$1')
 }
 
@@ -33,6 +32,12 @@ function getImageSrc(value: any, w = 1200, h = 675): string | null {
   if (value?.asset?.url) return cleanWixUrl(value.asset.url)
   if (typeof value === 'string' && value.startsWith('http')) return cleanWixUrl(value)
   return null
+}
+
+function getFirstParaText(body: any[]): string {
+  if (!body) return ''
+  const block = body.find((b: any) => b._type === 'block' && b.style === 'normal')
+  return block?.children?.map((c: any) => c.text).join('') ?? ''
 }
 
 const portableTextComponents = {
@@ -129,9 +134,29 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
 
   const readingTime = calcReadingTime(post.body)
   const hasRelated = related.length > 0
+
+  // Cover image — mainImage (Sanity) or mainImageUrl (Wix CDN)
   const coverSrc = post.mainImage
     ? urlFor(post.mainImage).width(1200).height(675).url()
     : post.mainImageUrl ? cleanWixUrl(post.mainImageUrl) : null
+
+  // Excerpt fallback: use first paragraph of body
+  const displayExcerpt = post.excerpt || getFirstParaText(post.body)
+
+  // Remove first image block from body if it matches cover (avoid duplicate)
+  const coverBase = coverSrc ? coverSrc.split('~mv2')[0].split('/').pop() ?? '' : ''
+  let firstImageSkipped = false
+  const bodyFiltered = post.body?.filter((block: any) => {
+    if (block._type !== 'image') return true
+    if (firstImageSkipped) return true
+    const src = getImageSrc(block) ?? ''
+    const srcBase = src.split('~mv2')[0].split('/').pop() ?? ''
+    if (coverBase && srcBase && srcBase === coverBase) {
+      firstImageSkipped = true
+      return false
+    }
+    return true
+  }) ?? []
 
   const shareHref = (platform: string) => {
     const url = encodeURIComponent(window.location.href)
@@ -168,7 +193,9 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
             <h1 style={{ margin: '16px 0 0', fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px,6.5vw,46px)', fontWeight: 600, lineHeight: 1.1, color: 'var(--fg)' }}>
               {post.title}
             </h1>
-            <p style={{ margin: '24px 0 0', fontSize: 18, lineHeight: 1.6, color: 'var(--muted-fg)' }}>{post.excerpt}</p>
+            {displayExcerpt && (
+              <p style={{ margin: '24px 0 0', fontSize: 18, lineHeight: 1.6, color: 'var(--muted-fg)' }}>{displayExcerpt}</p>
+            )}
 
             <div style={{ marginTop: 32, display: 'flex', alignItems: 'center', gap: 12, borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '20px 0' }}>
               <Link href={`/bon-nay/${post.author?.slug?.current}`} style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
@@ -190,7 +217,7 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
           )}
 
           <div style={{ marginTop: 48 }}>
-            <PortableText value={post.body} components={portableTextComponents} />
+            <PortableText value={bodyFiltered} components={portableTextComponents} />
           </div>
 
           {post.artists?.length > 0 && (

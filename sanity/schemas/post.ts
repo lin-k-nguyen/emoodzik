@@ -50,13 +50,6 @@ export default defineType({
       description: 'Search existing artists or create new ones inline.',
     }),
     defineField({
-      name: 'excerpt',
-      title: 'Brief / Excerpt',
-      type: 'text',
-      rows: 3,
-      description: 'Short summary. Also used as SEO description default.',
-    }),
-    defineField({
       name: 'mainImage',
       title: 'Cover Image',
       type: 'image',
@@ -67,6 +60,13 @@ export default defineType({
       title: 'Cover Image URL (Wix CDN)',
       type: 'url',
       description: 'Temporary: dùng khi chưa upload ảnh lên Sanity.',
+    }),
+    defineField({
+      name: 'excerpt',
+      title: 'Brief / Excerpt',
+      type: 'text',
+      rows: 3,
+      description: 'Tự động lấy từ đoạn đầu bài nếu để trống.',
     }),
     defineField({
       name: 'body',
@@ -119,6 +119,7 @@ export default defineType({
       title: 'title',
       author: 'author.name',
       media: 'mainImage',
+      imageUrl: 'mainImageUrl',
     },
     prepare(value: Record<string, any>) {
       return {
