@@ -13,6 +13,7 @@ export default function MusicBlogPage() {
   const [posts, setPosts] = useState<any[]>([])
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [visibleCount, setVisibleCount] = useState(PER_PAGE)
 
   useEffect(() => {
     client.fetch(`*[_type == "category"] | order(title asc) { _id, title, slug }`).then(setCategories)
@@ -20,6 +21,7 @@ export default function MusicBlogPage() {
 
   useEffect(() => {
     setLoading(true)
+    setVisibleCount(PER_PAGE)
     const query = activeCat === 'all'
       ? `*[_type == "post"] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title, slug}, author->{name, slug, avatar} }`
       : `*[_type == "post" && category->slug.current == $cat] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title, slug}, author->{name, slug, avatar} }`
@@ -74,27 +76,43 @@ export default function MusicBlogPage() {
         {loading ? (
           <p style={{ textAlign: 'center', color: 'var(--muted-fg)', padding: 40 }}>Đang tải...</p>
         ) : (
-          <div className="grid-4">
-            {pagePosts.map(p => <PostCard key={p._id} post={p} author={p.author} sanity />)}
-          </div>
-        )}
+          <>
+            {/* Desktop: numbered pagination */}
+            <div className="desk" style={{ display: 'block' }}>
+              <div className="grid-4">
+                {pagePosts.map(p => <PostCard key={p._id} post={p} author={p.author} sanity />)}
+              </div>
+              {totalPages > 1 && (
+                <nav style={{ marginTop: 64, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                  {currentPage > 1 && (
+                    <button onClick={() => setPage(p => p - 1)} style={pgBtn(false)}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg>
+                    </button>
+                  )}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
+                    <button key={n} onClick={() => setPage(n)} style={pgBtn(n === currentPage)}>{n}</button>
+                  ))}
+                  {currentPage < totalPages && (
+                    <button onClick={() => setPage(p => p + 1)} style={pgBtn(false)}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>
+                    </button>
+                  )}
+                </nav>
+              )}
+            </div>
 
-        {totalPages > 1 && (
-          <nav style={{ marginTop: 64, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-            {currentPage > 1 && (
-              <button onClick={() => setPage(p => p - 1)} style={pgBtn(false)}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg>
-              </button>
-            )}
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-              <button key={n} onClick={() => setPage(n)} style={pgBtn(n === currentPage)}>{n}</button>
-            ))}
-            {currentPage < totalPages && (
-              <button onClick={() => setPage(p => p + 1)} style={pgBtn(false)}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>
-              </button>
-            )}
-          </nav>
+            {/* Mobile: Xem thêm */}
+            <div className="mob" style={{ flexDirection: 'column' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+                {posts.slice(0, visibleCount).map(p => <PostCard key={p._id} post={p} author={p.author} sanity />)}
+              </div>
+              {visibleCount < posts.length && (
+                <button onClick={() => setVisibleCount(v => v + PER_PAGE)} style={{ marginTop: 32, width: '100%', height: 52, border: '1px solid var(--border)', background: 'none', color: 'var(--fg)', fontSize: 15, fontFamily: 'inherit', cursor: 'pointer', fontWeight: 500 }}>
+                  Xem thêm
+                </button>
+              )}
+            </div>
+          </>
         )}
       </section>
     </>
