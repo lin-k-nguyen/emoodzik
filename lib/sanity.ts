@@ -70,7 +70,7 @@ export async function getAllCategories() {
 
 export async function getAllSeries() {
   return client.fetch(`
-    *[_type == "series"] | order(title asc) {
+    *[_type == "series"] | order(sortOrder asc, title asc) {
       _id, title, slug, description
     }
   `)
