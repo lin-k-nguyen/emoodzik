@@ -7,7 +7,6 @@ import { client, urlFor } from '@/lib/sanity'
 
 export default function BonNayPage() {
   const [authors, setAuthors] = useState<any[]>([])
-  const [modalAuthor, setModalAuthor] = useState<any>(null)
   const [contactSent, setContactSent] = useState(false)
   const [form, setForm] = useState({ name: '', email: '', message: '' })
 
@@ -37,12 +36,12 @@ export default function BonNayPage() {
           <p style={{ margin: 0, fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.15em', color: 'var(--muted-fg)' }}>Team EmoodziK</p>
           <div className="auth-grid" style={{ marginTop: 20 }}>
             {authors.map(a => (
-              <button key={a._id} type="button" onClick={() => setModalAuthor(a)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, border: 'none', background: 'none', padding: 0, cursor: 'pointer', textAlign: 'center' }}>
+              <Link key={a._id} href={`/bon-nay/${a.slug?.current}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
                 <div style={{ position: 'relative', width: '100%', aspectRatio: '1', background: 'var(--muted)', overflow: 'hidden' }}>
                   {a.avatar && <Image src={urlFor(a.avatar).width(200).height(200).url()} alt={a.name} fill style={{ objectFit: 'cover' }} />}
                 </div>
                 <span style={{ fontFamily: 'var(--font-serif)', fontSize: 15, fontWeight: 600, color: 'var(--fg)' }}>{a.name}</span>
-              </button>
+              </Link>
             ))}
           </div>
           <p style={{ margin: '18px 0 0', fontSize: 13, color: 'var(--muted-fg)' }}>Artwork by Thủy Torchy</p>
@@ -68,32 +67,6 @@ export default function BonNayPage() {
           </form>
         )}
       </div>
-
-      {modalAuthor && (
-        <div role="dialog" aria-modal="true" style={{ position: 'fixed', inset: 0, zIndex: 70, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-          <div onClick={() => setModalAuthor(null)} style={{ position: 'absolute', inset: 0, background: 'color-mix(in oklab,var(--fg) 45%,transparent)', backdropFilter: 'blur(4px)' }} />
-          <div style={{ position: 'relative', width: '100%', maxWidth: 560, maxHeight: '84vh', overflowY: 'auto', border: '1px solid var(--border)', background: 'var(--bg)', boxShadow: '0 30px 60px rgba(0,0,0,.45)' }}>
-            <button type="button" onClick={() => setModalAuthor(null)} style={{ position: 'absolute', top: 16, right: 16, display: 'flex', width: 36, height: 36, alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--muted-fg)', cursor: 'pointer' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12" /></svg>
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '32px 32px 24px', borderBottom: '1px solid var(--border)' }}>
-              <div style={{ position: 'relative', width: 88, height: 88, flex: 'none', background: 'var(--muted)', overflow: 'hidden' }}>
-                {modalAuthor.avatar && <Image src={urlFor(modalAuthor.avatar).width(176).height(176).url()} alt={modalAuthor.name} fill style={{ objectFit: 'cover' }} />}
-              </div>
-              <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 30, fontWeight: 700, color: 'var(--fg)' }}>{modalAuthor.name}</h3>
-            </div>
-            <div style={{ padding: '24px 32px 28px' }}>
-              <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'flex-end', borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
-                <Link href={`/bon-nay/${modalAuthor.slug?.current}`} onClick={() => setModalAuthor(null)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 500, color: 'var(--brand)', textDecoration: 'none' }}>
-                  Xem tất cả bài viết
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                </Link>
-              </div>
-              <p style={{ margin: 0, lineHeight: 1.7, color: 'var(--muted-fg)' }}>{modalAuthor.about}</p>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   )
 }
