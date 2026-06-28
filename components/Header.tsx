@@ -27,10 +27,11 @@ export default function Header({ onSearchOpen }: HeaderProps) {
         borderBottom: '1px solid var(--border)',
         background: 'color-mix(in oklab,var(--bg) 80%,transparent)',
         backdropFilter: 'blur(12px)',
+        minHeight: 64,
       }}>
         <div style={{
           margin: '0 auto', maxWidth: 1280,
-          display: 'flex', height: 64,
+          display: 'flex', height: '100%',
           alignItems: 'center', justifyContent: 'space-between',
           gap: 16, padding: '0 24px',
         }}>
@@ -124,10 +125,6 @@ export default function Header({ onSearchOpen }: HeaderProps) {
               </Link>
             </div>
 
-            <Link href="/newsletter" onClick={() => setMenuOpen(false)}
-              style={{ marginTop: 32, background: 'var(--primary)', padding: '14px 16px', textAlign: 'center', fontSize: 15, fontWeight: 600, color: 'var(--primary-fg)', textDecoration: 'none', borderRadius: '9999px' }}>
-              Subscribe
-            </Link>
           </nav>
         </div>
       )}

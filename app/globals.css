@@ -120,8 +120,8 @@ nav a, nav button { text-transform: uppercase; letter-spacing: 0.05em; white-spa
 @supports (padding-top: env(safe-area-inset-top)) {
   header {
     padding-top: env(safe-area-inset-top) !important;
+    height: calc(64px + env(safe-area-inset-top)) !important;
   }
-  
   .mobile-menu-overlay {
     padding-top: env(safe-area-inset-top) !important;
   }
