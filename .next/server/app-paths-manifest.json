@@ -1,0 +1,8 @@
+{
+  "/series/[slug]/page": "app/series/[slug]/page.js",
+  "/music-blog/page": "app/music-blog/page.js",
+  "/page": "app/page.js",
+  "/posts/[slug]/page": "app/posts/[slug]/page.js",
+  "/bon-nay/page": "app/bon-nay/page.js",
+  "/series/page": "app/series/page.js"
+}
