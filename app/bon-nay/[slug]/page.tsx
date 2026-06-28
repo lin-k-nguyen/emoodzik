@@ -48,14 +48,14 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
               )}
             </div>
 
-            {/* Cột 3: Bài viết sidebar */}
+            {/* Cột 3: Bài viết sidebar — fixed height + scroll */}
             <aside style={{ borderLeft: '1px solid var(--border)', paddingLeft: 40 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
                 <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--fg)' }}>Bài viết</h2>
                 <span style={{ fontSize: 14, color: 'var(--muted-fg)' }}>{posts.length} bài</span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {posts.slice(0, 5).map(p => (
+              <div style={{ maxHeight: 900, overflowY: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+                {posts.map(p => (
                   <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
                     <div style={{ position: 'relative', flex: '0 0 84px', width: 84, height: 64, background: 'var(--muted)', overflow: 'hidden' }}>
                       {p.mainImage && <Image src={urlFor(p.mainImage).width(168).height(128).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
@@ -69,9 +69,6 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
                   </Link>
                 ))}
               </div>
-              {posts.length > 5 && (
-                <p style={{ marginTop: 16, fontSize: 13, color: 'var(--muted-fg)' }}>và {posts.length - 5} bài viết khác</p>
-              )}
             </aside>
           </div>
         </div>
