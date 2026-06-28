@@ -27,7 +27,8 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
             Bọn Này
           </Link>
 
-          <div style={{ marginTop: 40, display: 'grid', gridTemplateColumns: '160px 1fr 380px', gap: 48, alignItems: 'start' }}>
+          {/* Responsive: stack on mobile, 3-col on desktop */}
+          <div style={{ marginTop: 40, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 40, alignItems: 'start' }}>
 
             {/* Cột 1: Avatar + tên */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
@@ -38,7 +39,7 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
             </div>
 
             {/* Cột 2: Bio */}
-            <div style={{ paddingLeft: 8 }}>
+            <div>
               {author.about && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {author.about.split('\n\n').map((para: string, i: number) => (
@@ -48,20 +49,20 @@ export default function AuthorPage({ params }: { params: Promise<{ slug: string 
               )}
             </div>
 
-            {/* Cột 3: Bài viết sidebar — fixed height + scroll */}
-            <aside style={{ borderLeft: '1px solid var(--border)', paddingLeft: 40 }}>
+            {/* Cột 3: Bài viết sidebar */}
+            <aside style={{ borderTop: '1px solid var(--border)', paddingTop: 24 }}>
               <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
                 <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--fg)' }}>Bài viết</h2>
                 <span style={{ fontSize: 14, color: 'var(--muted-fg)' }}>{posts.length} bài</span>
               </div>
-              <div style={{ maxHeight: 900, overflowY: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+              <div style={{ maxHeight: 600, overflowY: 'auto', scrollbarWidth: 'none' }}>
                 {posts.map(p => (
                   <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
-                    <div style={{ position: 'relative', flex: '0 0 84px', width: 84, height: 64, background: 'var(--muted)', overflow: 'hidden' }}>
-                      {p.mainImage && <Image src={urlFor(p.mainImage).width(168).height(128).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
+                    <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
+                      {p.mainImage && <Image src={urlFor(p.mainImage).width(160).height(120).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
                     </div>
                     <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-                      <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 15, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
+                      <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
                         {p.title}
                       </h3>
                       <p style={{ margin: 'auto 0 0', fontSize: 12, color: 'var(--muted-fg)' }}>{p.category?.title}</p>

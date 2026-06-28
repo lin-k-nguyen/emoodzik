@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { CATEGORIES, SERIES } from '@/lib/data'
 
@@ -11,83 +11,131 @@ interface HeaderProps {
 export default function Header({ onSearchOpen }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false)
 
+  // Prevent body scroll when menu open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
   return (
-    <header style={{
-      position: 'sticky', top: 0, zIndex: 50,
-      borderBottom: '1px solid var(--border)',
-      background: 'color-mix(in oklab,var(--bg) 80%,transparent)',
-      backdropFilter: 'blur(12px)',
-    }}>
-      <div style={{
-        margin: '0 auto', maxWidth: 1280,
-        display: 'flex', height: 64,
-        alignItems: 'center', justifyContent: 'space-between',
-        gap: 16, padding: '0 24px',
+    <>
+      <header style={{
+        position: 'sticky', top: 0, zIndex: 50,
+        borderBottom: '1px solid var(--border)',
+        background: 'color-mix(in oklab,var(--bg) 80%,transparent)',
+        backdropFilter: 'blur(12px)',
       }}>
-        {/* Logo */}
-        <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em', color: 'var(--fg)', textDecoration: 'none' }}>
-          Emoodzi<span style={{ color: 'var(--brand)' }}>K</span>
-        </Link>
-
-        {/* Desktop nav */}
-        <nav className="desk" style={{ alignItems: 'center', gap: 24 }}>
-          <Link href="/music-blog" style={navLink}>Music Blog</Link>
-          <Link href="/series" style={navLink}>Series</Link>
-          <Link href="/nghe-si" style={navLink}>Nghệ Sĩ</Link>
-          <Link href="/bon-nay" style={navLink}>Bọn Này</Link>
-          <button
-            type="button"
-            onClick={onSearchOpen}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--muted-fg)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: '7px 12px', textTransform: 'uppercase', letterSpacing: '.05em', fontWeight: 500 }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-            </svg>
-            <span>Tìm Kiếm</span>
-          </button>
-        </nav>
-
-        {/* Mobile controls */}
-        <div className="mob" style={{ alignItems: 'center', gap: 4 }}>
-          <button type="button" onClick={onSearchOpen} aria-label="Tìm kiếm" style={iconBtn}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-            </svg>
-          </button>
-          <button type="button" onClick={() => setMenuOpen(v => !v)} aria-label="Menu" style={iconBtn}>
-            {menuOpen
-              ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12" /></svg>
-              : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12h16M4 6h16M4 18h16" /></svg>
-            }
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      {menuOpen && (
-        <nav className="mob" style={{ flexDirection: 'column', gap: 4, borderTop: '1px solid var(--border)', padding: '16px 24px' }}>
-          <p style={{ margin: '8px 0 4px', padding: '0 4px', fontSize: 12, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.15em', color: 'var(--muted-fg)' }}>Music Blog</p>
-          {CATEGORIES.map(cat => (
-            <Link key={cat.slug} href={cat.slug === 'all' ? '/the-loai/all' : `/the-loai/${cat.slug}`} onClick={() => setMenuOpen(false)} style={{ padding: '8px 4px', fontSize: 14, color: 'var(--muted-fg)', textDecoration: 'none' }}>
-              {cat.label}
-            </Link>
-          ))}
-          <div style={{ margin: '8px 0', borderTop: '1px solid var(--border)' }} />
-          <p style={{ margin: '8px 0 4px', padding: '0 4px', fontSize: 12, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.15em', color: 'var(--muted-fg)' }}>Series</p>
-          {SERIES.map(s => (
-            <Link key={s.slug} href={`/series/${s.slug}`} onClick={() => setMenuOpen(false)} style={{ padding: '8px 4px', fontSize: 14, color: 'var(--muted-fg)', textDecoration: 'none' }}>
-              {s.label}
-            </Link>
-          ))}
-          <div style={{ margin: '8px 0', borderTop: '1px solid var(--border)' }} />
-          <Link href="/nghe-si" onClick={() => setMenuOpen(false)} style={{ padding: '8px 4px', fontSize: 14, color: 'var(--muted-fg)', textDecoration: 'none' }}>Nghệ Sĩ</Link>
-          <Link href="/bon-nay" onClick={() => setMenuOpen(false)} style={{ padding: '8px 4px', fontSize: 14, color: 'var(--muted-fg)', textDecoration: 'none' }}>Bọn Này</Link>
-          <Link href="/" onClick={() => setMenuOpen(false)} style={{ marginTop: 8, background: 'var(--primary)', padding: '10px 16px', textAlign: 'center', fontSize: 14, fontWeight: 500, color: 'var(--primary-fg)', textDecoration: 'none', borderRadius: '9999px' }}>
-            Subscribe
+        <div style={{
+          margin: '0 auto', maxWidth: 1280,
+          display: 'flex', height: 64,
+          alignItems: 'center', justifyContent: 'space-between',
+          gap: 16, padding: '0 24px',
+        }}>
+          {/* Logo */}
+          <Link href="/" style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em', color: 'var(--fg)', textDecoration: 'none' }}>
+            Emoodzi<span style={{ color: 'var(--brand)' }}>K</span>
           </Link>
-        </nav>
+
+          {/* Desktop nav */}
+          <nav className="desk" style={{ alignItems: 'center', gap: 24 }}>
+            <Link href="/music-blog" style={navLink}>Music Blog</Link>
+            <Link href="/series" style={navLink}>Series</Link>
+            <Link href="/nghe-si" style={navLink}>Nghệ Sĩ</Link>
+            <Link href="/bon-nay" style={navLink}>Bọn Này</Link>
+            <button
+              type="button"
+              onClick={onSearchOpen}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--muted-fg)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: '7px 12px', textTransform: 'uppercase', letterSpacing: '.05em', fontWeight: 500 }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+              </svg>
+              <span>Tìm Kiếm</span>
+            </button>
+          </nav>
+
+          {/* Mobile controls */}
+          <div className="mob" style={{ alignItems: 'center', gap: 4 }}>
+            <button type="button" onClick={onSearchOpen} aria-label="Tìm kiếm" style={iconBtn}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+              </svg>
+            </button>
+            <button type="button" onClick={() => setMenuOpen(v => !v)} aria-label="Menu" style={iconBtn}>
+              {menuOpen
+                ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12h16M4 6h16M4 18h16" /></svg>
+              }
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile menu — fullscreen overlay */}
+      {menuOpen && (
+        <div className="mob" style={{
+          position: 'fixed', inset: 0, zIndex: 60,
+          background: 'var(--bg)',
+          flexDirection: 'column',
+          overflowY: 'auto',
+          // Safe area for iPhone notch/dynamic island
+          paddingTop: 'env(safe-area-inset-top)',
+        }}>
+          {/* Header bar inside overlay */}
+          <div style={{
+            display: 'flex', height: 64, alignItems: 'center',
+            justifyContent: 'space-between', padding: '0 24px',
+            borderBottom: '1px solid var(--border)', flexShrink: 0,
+          }}>
+            <Link href="/" onClick={() => setMenuOpen(false)} style={{ fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 600, color: 'var(--fg)', textDecoration: 'none' }}>
+              Emoodzi<span style={{ color: 'var(--brand)' }}>K</span>
+            </Link>
+            <button type="button" onClick={() => setMenuOpen(false)} aria-label="Đóng menu" style={iconBtn}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12" /></svg>
+            </button>
+          </div>
+
+          {/* Menu content */}
+          <nav style={{ flex: 1, padding: '24px 24px 40px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.15em', color: 'var(--muted-fg)' }}>Music Blog</p>
+            {CATEGORIES.map(cat => (
+              <Link key={cat.slug} href={cat.slug === 'all' ? '/music-blog' : `/the-loai/${cat.slug}`} onClick={() => setMenuOpen(false)}
+                style={{ padding: '12px 0', fontSize: 18, fontFamily: 'var(--font-serif)', fontWeight: 500, color: 'var(--fg)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
+                {cat.label}
+              </Link>
+            ))}
+
+            <p style={{ margin: '24px 0 8px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.15em', color: 'var(--muted-fg)' }}>Series</p>
+            {SERIES.map(s => (
+              <Link key={s.slug} href={`/series/${s.slug}`} onClick={() => setMenuOpen(false)}
+                style={{ padding: '12px 0', fontSize: 18, fontFamily: 'var(--font-serif)', fontWeight: 500, color: 'var(--fg)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
+                {s.label}
+              </Link>
+            ))}
+
+            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <Link href="/nghe-si" onClick={() => setMenuOpen(false)}
+                style={{ padding: '12px 0', fontSize: 18, fontFamily: 'var(--font-serif)', fontWeight: 500, color: 'var(--fg)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
+                Nghệ Sĩ
+              </Link>
+              <Link href="/bon-nay" onClick={() => setMenuOpen(false)}
+                style={{ padding: '12px 0', fontSize: 18, fontFamily: 'var(--font-serif)', fontWeight: 500, color: 'var(--fg)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
+                Bọn Này
+              </Link>
+            </div>
+
+            <Link href="/newsletter" onClick={() => setMenuOpen(false)}
+              style={{ marginTop: 32, background: 'var(--primary)', padding: '14px 16px', textAlign: 'center', fontSize: 15, fontWeight: 600, color: 'var(--primary-fg)', textDecoration: 'none', borderRadius: '9999px' }}>
+              Subscribe
+            </Link>
+          </nav>
+        </div>
       )}
-    </header>
+    </>
   )
 }
 
