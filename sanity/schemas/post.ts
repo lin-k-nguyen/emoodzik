@@ -15,7 +15,44 @@ export default defineType({
     defineField({ name: 'publishedAt', title: 'Ngày đăng', type: 'datetime' }),
     defineField({ name: 'readingTime', title: 'Thời gian đọc', type: 'string' }),
     defineField({ name: 'artists', title: 'Nghệ sĩ nhắc tới', type: 'array', of: [{ type: 'string' }] }),
-    defineField({ name: 'body', title: 'Nội dung', type: 'array', of: [{ type: 'block' }] }),
+    defineField({
+  name: 'body',
+  title: 'Nội dung',
+  type: 'array',
+  of: [
+    { type: 'block' },
+    {
+      type: 'image',
+      title: 'Hình ảnh',
+      options: { hotspot: true },
+      fields: [
+        {
+          name: 'caption',
+          type: 'string',
+          title: 'Chú thích',
+        },
+      ],
+    },
+    {
+      type: 'object',
+      name: 'youtube',
+      title: 'YouTube Video',
+      fields: [
+        {
+          name: 'url',
+          type: 'url',
+          title: 'YouTube URL',
+        },
+      ],
+      preview: {
+        select: { url: 'url' },
+        prepare({ url }: { url: string }) {
+          return { title: 'YouTube', subtitle: url }
+        },
+      },
+    },
+  ],
+}),
     defineField({ name: 'seoTitle', title: 'SEO Title', type: 'string' }),
     defineField({ name: 'seoDescription', title: 'SEO Description', type: 'text' }),
   ],
