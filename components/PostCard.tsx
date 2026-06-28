@@ -10,10 +10,19 @@ interface PostCardProps {
   sanity?: boolean
 }
 
+function cleanWixUrl(url: string): string {
+  return url.replace(/~mv2\.(jpg|jpeg|png|webp)~mv2\.\w+/gi, '~mv2.$1')
+}
+
+function getFirstParaText(body: any[]): string {
+  if (!body) return ''
+  const block = body.find((b: any) => b._type === 'block' && b.style === 'normal')
+  return block?.children?.map((c: any) => c.text).join('') ?? ''
+}
+
 export default function PostCard({ post, author, sanity }: PostCardProps) {
   const href = sanity ? `/posts/${post.slug.current}` : `/posts/${post.slug}`
   const title = post.title
-  const excerpt = post.excerpt
   const category = sanity ? post.category?.title : post.category
   const date = sanity ? post.publishedAt : post.date
   const authorName = author?.name
@@ -21,11 +30,14 @@ export default function PostCard({ post, author, sanity }: PostCardProps) {
     ? (author?.avatar ? urlFor(author.avatar).width(64).height(64).url() : null)
     : author?.avatar
 
-  // Fallback: mainImage → mainImageUrl (Wix CDN)
+  // Excerpt: use excerpt field or fallback to first paragraph of body
+  const excerpt = post.excerpt || (sanity ? getFirstParaText(post.body) : '')
+
+  // Image: mainImage (Sanity) → mainImageUrl (Wix CDN, cleaned) → null
   const imageUrl = sanity
     ? (post.mainImage
         ? urlFor(post.mainImage).width(600).height(400).url()
-        : post.mainImageUrl ?? null)
+        : post.mainImageUrl ? cleanWixUrl(post.mainImageUrl) : null)
     : post.image
 
   const fmtDate = (d: string) => {
@@ -44,7 +56,7 @@ export default function PostCard({ post, author, sanity }: PostCardProps) {
               fill
               style={{ objectFit: 'cover' }}
               loading="lazy"
-              unoptimized={!post.mainImage} // skip Next.js optimization for external Wix URLs
+              unoptimized={!post.mainImage}
             />
           )}
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: '44px 14px 13px', background: 'linear-gradient(to top,rgba(6,5,4,.96),rgba(6,5,4,.55) 55%,rgba(6,5,4,0))' }}>
