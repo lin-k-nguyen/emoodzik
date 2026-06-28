@@ -34,11 +34,6 @@ function getImageSrc(value: any, w = 1200, h = 675): string | null {
   return null
 }
 
-function getFirstParaText(body: any[]): string {
-  if (!body) return ''
-  const block = body.find((b: any) => b._type === 'block' && b.style === 'normal')
-  return block?.children?.map((c: any) => c.text).join('') ?? ''
-}
 
 const portableTextComponents = {
   block: {
@@ -97,9 +92,9 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
 
   useEffect(() => {
     client.fetch(`*[_type == "post" && slug.current == $slug][0] {
-      _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, body,
-      category->{_ref, title, slug},
-      series->{_ref, title, slug},
+      _id, title, slug, publishedAt, mainImage, mainImageUrl, body,
+      category->{_id, title, slug},
+      series->{_id, title, slug},
       author->{name, slug, avatar, about},
       artists[]->{name, slug},
       seoTitle, seoDescription
@@ -108,16 +103,16 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
       setPost(data)
 
       let rel: any[] = []
-      if (data.series?._ref) {
-        rel = await client.fetch(`*[_type == "post" && slug.current != $slug && series._ref == $seriesRef] | order(publishedAt desc)[0...5] {
+      if (data.series?._id) {
+        rel = await client.fetch(`*[_type == "post" && slug.current != $slug && series->_id == $seriesId] | order(publishedAt desc)[0...5] {
           _id, title, slug, publishedAt, mainImage, mainImageUrl, category->{title, slug}
-        }`, { slug, seriesRef: data.series._ref })
+        }`, { slug, seriesId: data.series._id })
         if (rel.length > 0) setRelatedLabel(data.series.title)
       }
-      if (rel.length === 0 && data.category?._ref) {
-        rel = await client.fetch(`*[_type == "post" && slug.current != $slug && category._ref == $catRef] | order(publishedAt desc)[0...5] {
+      if (rel.length === 0 && data.category?._id) {
+        rel = await client.fetch(`*[_type == "post" && slug.current != $slug && category->_id == $catId] | order(publishedAt desc)[0...5] {
           _id, title, slug, publishedAt, mainImage, mainImageUrl, category->{title, slug}
-        }`, { slug, catRef: data.category._ref })
+        }`, { slug, catId: data.category._id })
         if (rel.length > 0) setRelatedLabel(data.category.title)
       }
       setRelated(rel)
@@ -139,9 +134,6 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
   const coverSrc = post.mainImage
     ? urlFor(post.mainImage).width(1200).height(675).url()
     : post.mainImageUrl ? cleanWixUrl(post.mainImageUrl) : null
-
-  // Excerpt fallback: use first paragraph of body
-  const displayExcerpt = post.excerpt || getFirstParaText(post.body)
 
   // Remove first image block from body if it matches cover (avoid duplicate)
   const coverBase = coverSrc ? coverSrc.split('~mv2')[0].split('/').pop() ?? '' : ''
@@ -193,10 +185,6 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
             <h1 style={{ margin: '16px 0 0', fontFamily: 'var(--font-serif)', fontSize: 'clamp(28px,6.5vw,46px)', fontWeight: 600, lineHeight: 1.1, color: 'var(--fg)' }}>
               {post.title}
             </h1>
-            {displayExcerpt && (
-              <p style={{ margin: '24px 0 0', fontSize: 18, lineHeight: 1.6, color: 'var(--muted-fg)' }}>{displayExcerpt}</p>
-            )}
-
             <div style={{ marginTop: 32, display: 'flex', alignItems: 'center', gap: 12, borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '20px 0' }}>
               <Link href={`/bon-nay/${post.author?.slug?.current}`} style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
                 {post.author?.avatar && (
@@ -225,7 +213,7 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
               <p style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 500, color: 'var(--muted-fg)' }}>Nghệ sĩ nhắc tới</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {post.artists.map((a: any) => (
-                  <Link key={a.slug?.current} href={`/tim-kiem?q=${encodeURIComponent(a.name)}`} style={{ border: '1px solid var(--border)', padding: '6px 12px', fontSize: 14, color: 'var(--fg)', textDecoration: 'none', borderRadius: '9999px' }}>
+                  <Link key={a.slug?.current} href={`/nghe-si/${a.slug?.current}`} style={{ border: '1px solid var(--border)', padding: '6px 12px', fontSize: 14, color: 'var(--fg)', textDecoration: 'none', borderRadius: '9999px' }}>
                     {a.name}
                   </Link>
                 ))}
