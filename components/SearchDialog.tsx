@@ -75,4 +75,36 @@ export default function SearchDialog({ onClose }: SearchDialogProps) {
 
         <div style={{ maxHeight: '60vh', overflowY: 'auto', padding: 8 }}>
           {results.length > 0 ? (
-            <ul
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {results.slice(0, 6).map(p => (
+                <li key={p._id}>
+                  <Link href={`/posts/${p.slug.current}`} onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '12px 14px', textDecoration: 'none' }}>
+                    <div style={{ position: 'relative', width: 56, height: 56, flex: 'none', overflow: 'hidden', background: 'var(--secondary)' }}>
+                      {p.mainImage && <Image src={urlFor(p.mainImage).width(112).height(112).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ margin: 0, fontSize: 12, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--brand)' }}>{p.category?.title}</p>
+                      <p style={{ margin: 0, fontWeight: 500, color: 'var(--fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</p>
+                      <p style={{ margin: 0, fontSize: 14, color: 'var(--muted-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.excerpt}</p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : q ? (
+            <p style={{ padding: '40px 16px', textAlign: 'center', fontSize: 14, color: 'var(--muted-fg)' }}>
+              Không tìm thấy bài viết nào cho &ldquo;{query}&rdquo;
+            </p>
+          ) : null}
+        </div>
+
+        {results.length > 6 && (
+          <Link href={`/tim-kiem?q=${encodeURIComponent(q)}`} onClick={onClose} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, borderTop: '1px solid var(--border)', padding: 16, fontSize: 14, fontWeight: 500, color: 'var(--brand)', textDecoration: 'none' }}>
+            Xem tất cả {results.length} kết quả
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+          </Link>
+        )}
+      </div>
+    </div>
+  )
+}
