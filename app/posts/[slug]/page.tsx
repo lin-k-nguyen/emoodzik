@@ -19,6 +19,19 @@ function calcReadingTime(body: any[]): string {
   return `${Math.max(1, Math.ceil(words / 200))} phút đọc`
 }
 
+function getImageSrc(value: any, w = 1200, h = 675): string | null {
+  if (!value) return null
+  const ref = value?.asset?._ref ?? ''
+  // Sanity asset ref format: image-xxxx-WxH-ext
+  if (ref.startsWith('image-') && !ref.includes('~mv2') && !ref.includes('.jpg~')) {
+    return urlFor(value).width(w).height(h).url()
+  }
+  // Wix CDN URL stored directly
+  if (value?.asset?.url) return value.asset.url
+  if (typeof value === 'string' && value.startsWith('http')) return value
+  return null
+}
+
 const portableTextComponents = {
   block: {
     normal: ({ children }: any) => (
@@ -42,14 +55,20 @@ const portableTextComponents = {
     ),
   },
   types: {
-    image: ({ value }: any) => (
-      <div style={{ margin: '32px 0', position: 'relative', width: '100%', aspectRatio: '16/9' }}>
-        <Image src={urlFor(value).width(1200).height(675).url()} alt={value.caption ?? ''} fill style={{ objectFit: 'cover' }} />
-        {value.caption && <p style={{ marginTop: 8, fontSize: 13, color: 'var(--muted-fg)', textAlign: 'center' }}>{value.caption}</p>}
-      </div>
-    ),
+    image: ({ value }: any) => {
+      const src = getImageSrc(value)
+      if (!src) return null
+      const isSanity = src.includes('cdn.sanity.io')
+      return (
+        <div style={{ margin: '32px 0', position: 'relative', width: '100%', aspectRatio: '16/9' }}>
+          <Image src={src} alt={value.caption ?? ''} fill style={{ objectFit: 'cover' }} unoptimized={!isSanity} />
+          {value.caption && <p style={{ marginTop: 8, fontSize: 13, color: 'var(--muted-fg)', textAlign: 'center' }}>{value.caption}</p>}
+        </div>
+      )
+    },
     youtube: ({ value }: any) => {
       const videoId = value.url?.split('v=')[1]?.split('&')[0] ?? value.url?.split('/').pop()
+      if (!videoId) return null
       return (
         <div style={{ margin: '32px 0', position: 'relative', paddingBottom: '56.25%', height: 0 }}>
           <iframe src={`https://www.youtube.com/embed/${videoId}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }} allowFullScreen />
@@ -70,7 +89,7 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
 
   useEffect(() => {
     client.fetch(`*[_type == "post" && slug.current == $slug][0] {
-      _id, title, slug, excerpt, publishedAt, mainImage, body,
+      _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, body,
       category->{_ref, title, slug},
       series->{_ref, title, slug},
       author->{name, slug, avatar, about},
@@ -83,13 +102,13 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
       let rel: any[] = []
       if (data.series?._ref) {
         rel = await client.fetch(`*[_type == "post" && slug.current != $slug && series._ref == $seriesRef] | order(publishedAt desc)[0...5] {
-          _id, title, slug, publishedAt, mainImage, category->{title, slug}
+          _id, title, slug, publishedAt, mainImage, mainImageUrl, category->{title, slug}
         }`, { slug, seriesRef: data.series._ref })
         if (rel.length > 0) setRelatedLabel(data.series.title)
       }
       if (rel.length === 0 && data.category?._ref) {
         rel = await client.fetch(`*[_type == "post" && slug.current != $slug && category._ref == $catRef] | order(publishedAt desc)[0...5] {
-          _id, title, slug, publishedAt, mainImage, category->{title, slug}
+          _id, title, slug, publishedAt, mainImage, mainImageUrl, category->{title, slug}
         }`, { slug, catRef: data.category._ref })
         if (rel.length > 0) setRelatedLabel(data.category.title)
       }
@@ -107,6 +126,9 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
 
   const readingTime = calcReadingTime(post.body)
   const hasRelated = related.length > 0
+  const coverSrc = post.mainImage
+    ? urlFor(post.mainImage).width(1200).height(675).url()
+    : post.mainImageUrl ?? null
 
   const shareHref = (platform: string) => {
     const url = encodeURIComponent(window.location.href)
@@ -128,8 +150,6 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
         gap: hasRelated ? 64 : undefined,
         alignItems: 'start',
       }}>
-
-        {/* Main article */}
         <article>
           <Link href="/music-blog" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--muted-fg)', textDecoration: 'none' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
@@ -160,9 +180,9 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
             </div>
           </header>
 
-          {post.mainImage && (
+          {coverSrc && (
             <div style={{ position: 'relative', marginTop: 40, width: '100%', aspectRatio: '16/9', overflow: 'hidden', background: 'var(--muted)' }}>
-              <Image src={urlFor(post.mainImage).width(1200).height(675).url()} alt={post.title} fill style={{ objectFit: 'cover' }} />
+              <Image src={coverSrc} alt={post.title} fill style={{ objectFit: 'cover' }} unoptimized={!post.mainImage} />
             </div>
           )}
 
@@ -200,7 +220,6 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
           </div>
         </article>
 
-        {/* Right sidebar - Đọc tiếp */}
         {hasRelated && (
           <aside style={{ borderLeft: '1px solid var(--border)', paddingLeft: 40, position: 'sticky', top: 88 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
@@ -208,19 +227,24 @@ export default function PostPage({ params }: { params: Promise<{ slug: string }>
               <span style={{ fontSize: 12, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--brand)' }}>{relatedLabel}</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {related.map(p => (
-                <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
-                  <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
-                    {p.mainImage && <Image src={urlFor(p.mainImage).width(160).height(120).url()} alt={p.title} fill style={{ objectFit: 'cover' }} />}
-                  </div>
-                  <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
-                    <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>
-                      {p.title}
-                    </h3>
-                    <p style={{ margin: 'auto 0 0', fontSize: 11, color: 'var(--muted-fg)' }}>{fmtDate(p.publishedAt)}</p>
-                  </div>
-                </Link>
-              ))}
+              {related.map(p => {
+                const relSrc = p.mainImage
+                  ? urlFor(p.mainImage).width(160).height(120).url()
+                  : p.mainImageUrl ?? null
+                return (
+                  <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
+                    <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
+                      {relSrc && <Image src={relSrc} alt={p.title} fill style={{ objectFit: 'cover' }} unoptimized={!p.mainImage} />}
+                    </div>
+                    <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+                      <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden' }}>
+                        {p.title}
+                      </h3>
+                      <p style={{ margin: 'auto 0 0', fontSize: 11, color: 'var(--muted-fg)' }}>{fmtDate(p.publishedAt)}</p>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           </aside>
         )}
