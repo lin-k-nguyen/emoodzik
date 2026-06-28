@@ -70,31 +70,50 @@ export default function NgheSiPage() {
 
       {letters.length > 0 ? (
         <>
-          <div style={{ marginTop: 40, display: 'flex', flexWrap: 'wrap', gap: 2, borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '12px 0' }}>
-            {letters.map(L => {
-              const active = L === activeLetter
-              return (
-                <button key={L} onClick={() => setSelectedLetter(L)} style={{ display: 'flex', width: 42, height: 42, alignItems: 'center', justifyContent: 'center', border: 'none', background: active ? '#ff2e2e' : 'transparent', fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 700, color: active ? '#fff' : 'var(--muted-fg)', cursor: 'pointer' }}>
-                  {L}
-                </button>
-              )
-            })}
-          </div>
-          {activeLetter && (
-            <div style={{ marginTop: 32 }}>
-              <h2 style={{ margin: '0 0 24px', fontFamily: 'var(--font-serif)', fontSize: 'clamp(30px,6vw,44px)', fontWeight: 700, lineHeight: 1, color: 'var(--brand)' }}>{activeLetter}</h2>
-              <ul className="art-grid" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                {activeArtists.map((a: any) => (
-                  <li key={a._id} style={{ padding: '0 0 12px' }}>
-                    <Link href={`/tim-kiem?q=${encodeURIComponent(a.name)}`} style={{ color: 'var(--fg)', textDecoration: 'none' }}>{a.name}</Link>
-                  </li>
-                ))}
-              </ul>
+          {/* Desktop: letter filter */}
+          <div className="desk" style={{ flexDirection: 'column' }}>
+            <div style={{ marginTop: 40, display: 'flex', flexWrap: 'wrap', gap: 2, borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '12px 0' }}>
+              {letters.map(L => {
+                const active = L === activeLetter
+                return (
+                  <button key={L} onClick={() => setSelectedLetter(L)} style={{ display: 'flex', width: 42, height: 42, alignItems: 'center', justifyContent: 'center', border: 'none', background: active ? '#ff2e2e' : 'transparent', fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 700, color: active ? '#fff' : 'var(--muted-fg)', cursor: 'pointer' }}>
+                    {L}
+                  </button>
+                )
+              })}
             </div>
-          )}
+            {activeLetter && (
+              <div style={{ marginTop: 32 }}>
+                <h2 style={{ margin: '0 0 24px', fontFamily: 'var(--font-serif)', fontSize: 'clamp(30px,6vw,44px)', fontWeight: 700, lineHeight: 1, color: 'var(--brand)' }}>{activeLetter}</h2>
+                <ul className="art-grid" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                  {activeArtists.map((a: any) => (
+                    <li key={a._id} style={{ padding: '0 0 12px' }}>
+                      <Link href={`/nghe-si/${a.slug?.current}`} style={{ color: 'var(--fg)', textDecoration: 'none' }}>{a.name}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile: all letters grouped, scrollable */}
+          <div className="mob" style={{ flexDirection: 'column', marginTop: 32 }}>
+            {letters.map(L => (
+              <div key={L} style={{ marginBottom: 32 }}>
+                <h2 style={{ margin: '0 0 12px', fontFamily: 'var(--font-serif)', fontSize: 32, fontWeight: 700, lineHeight: 1, color: 'var(--brand)' }}>{L}</h2>
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {(byLetter.get(L) ?? []).map((a: any) => (
+                    <li key={a._id}>
+                      <Link href={`/nghe-si/${a.slug?.current}`} style={{ color: 'var(--fg)', textDecoration: 'none', fontSize: 17 }}>{a.name}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </>
       ) : (
-        <p style={{ marginTop: 48, textAlign: 'center', fontSize: 14, color: 'var(--muted-fg)' }}>Không tìm thấy nghệ sĩ nào cho &ldquo;{query}&rdquo;</p>
+        <p style={{ marginTop: 48, textAlign: 'center', fontSize: 14, color: 'var(--muted-fg)' }}>Không tìm thấy nghệ sĩ nào{query ? ` cho "${query}"` : ''}</p>
       )}
     </section>
   )
