@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { notFound } from 'next/navigation'
 import { client, urlFor } from '@/lib/sanity'
 import PostCard from '@/components/PostCard'
 
@@ -20,7 +19,8 @@ function calcReadingTime(body: any[]): string {
   return `${Math.max(1, Math.ceil(words / 200))} phút đọc`
 }
 
-export default function PostPage({ params }: { params: { slug: string } }) {
+export default function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params)
   const [post, setPost] = useState<any>(null)
   const [related, setRelated] = useState<any[]>([])
   const [copied, setCopied] = useState(false)
@@ -30,18 +30,17 @@ export default function PostPage({ params }: { params: { slug: string } }) {
   useEffect(() => {
     client.fetch(`*[_type == "post" && slug.current == $slug][0] {
       _id, title, slug, excerpt, publishedAt, mainImage, body,
-      category->{title, slug},
+      category->{_ref, title, slug},
       series->{title, slug},
       author->{name, slug, avatar, about},
       artists[]->{name, slug},
       seoTitle, seoDescription
-    }`, { slug: params.slug }).then(async (data: any) => {
+    }`, { slug }).then(async (data: any) => {
       if (!data) { setLoading(false); return }
       setPost(data)
-      // fetch related
       const rel = await client.fetch(`*[_type == "post" && slug.current != $slug && category._ref == $catRef] | order(publishedAt desc)[0...4] {
         _id, title, slug, excerpt, publishedAt, mainImage, category->{title, slug}, author->{name, slug, avatar}
-      }`, { slug: params.slug, catRef: data.category?._ref ?? '' })
+      }`, { slug, catRef: data.category?._ref ?? '' })
       setRelated(rel)
       setLoading(false)
     })
@@ -49,10 +48,10 @@ export default function PostPage({ params }: { params: { slug: string } }) {
     const onScroll = () => setScrolled(window.scrollY > 600)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [params.slug])
+  }, [slug])
 
   if (loading) return <div style={{ padding: 120, textAlign: 'center', color: 'var(--muted-fg)' }}>Đang tải...</div>
-  if (!post) return notFound()
+  if (!post) return <div style={{ padding: 120, textAlign: 'center', color: 'var(--muted-fg)' }}>Không tìm thấy bài viết.</div>
 
   const readingTime = calcReadingTime(post.body)
 
@@ -134,7 +133,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
             <p style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 500, color: 'var(--muted-fg)' }}>Nghệ sĩ nhắc tới</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {post.artists.map((a: any) => (
-                <Link key={a._id} href={`/tim-kiem?q=${encodeURIComponent(a.name)}`} style={{ border: '1px solid var(--border)', padding: '6px 12px', fontSize: 14, color: 'var(--fg)', textDecoration: 'none', borderRadius: '9999px' }}>
+                <Link key={a.slug?.current} href={`/tim-kiem?q=${encodeURIComponent(a.name)}`} style={{ border: '1px solid var(--border)', padding: '6px 12px', fontSize: 14, color: 'var(--fg)', textDecoration: 'none', borderRadius: '9999px' }}>
                   {a.name}
                 </Link>
               ))}
@@ -161,7 +160,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
 
       {related.length > 0 && (
         <section style={{ margin: '96px auto 0', maxWidth: 1280, padding: '0 24px 80px' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
+          <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
             <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 26, color: 'var(--fg)' }}>Đọc tiếp</h2>
           </div>
           <div className="grid-4" style={{ paddingTop: 40 }}>
@@ -172,7 +171,7 @@ export default function PostPage({ params }: { params: { slug: string } }) {
 
       {scrolled && (
         <div style={{ position: 'fixed', right: 24, bottom: 96, zIndex: 55 }}>
-          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="fab" aria-label="Lên đầu trang" style={{ display: 'flex', width: 48, height: 48, alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--fg)', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,.18)', borderRadius: '9999px' }}>
+          <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Lên đầu trang" style={{ display: 'flex', width: 48, height: 48, alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--fg)', cursor: 'pointer', boxShadow: '0 8px 24px rgba(0,0,0,.18)', borderRadius: '9999px' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m18 15-6-6-6 6" /></svg>
           </button>
         </div>
