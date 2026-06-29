@@ -79,7 +79,7 @@ function YouTubeEmbed({ url }: { url: string }) {
           <path d="M8 5v14l11-7z" />
         </svg>
       </div>
-      
+      <a
         href={`https://www.youtube.com/watch?v=${videoId}`}
         target="_blank"
         rel="noreferrer"
