@@ -217,6 +217,29 @@ export default function PostDetail({ slug }: { slug: string }) {
               </button>
             </div>
           </div>
+
+          {post.author && (
+            <div style={{ marginTop: 48, borderTop: '1px solid var(--border)', paddingTop: 32 }}>
+              <p style={{ margin: '0 0 20px', fontSize: 12, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.12em', color: 'var(--muted-fg)' }}>Về tác giả</p>
+              <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+                {post.author.avatar && (
+                  <Link href={`/bon-nay/${post.author.slug?.current}`} style={{ flex: '0 0 72px', textDecoration: 'none' }}>
+                    <div style={{ position: 'relative', width: 72, height: 72, background: 'var(--muted)', overflow: 'hidden', borderRadius: '9999px' }}>
+                      <Image src={urlFor(post.author.avatar).width(144).height(144).url()} alt={post.author.name} fill style={{ objectFit: 'cover' }} />
+                    </div>
+                  </Link>
+                )}
+                <div style={{ flex: 1 }}>
+                  <Link href={`/bon-nay/${post.author.slug?.current}`} style={{ textDecoration: 'none' }}>
+                    <p style={{ margin: '0 0 8px', fontFamily: 'var(--font-serif)', fontSize: 18, fontWeight: 600, color: 'var(--fg)' }}>{post.author.name}</p>
+                  </Link>
+                  {post.author.about && (
+                    <p style={{ margin: 0, fontSize: 14, lineHeight: 1.7, color: 'var(--muted-fg)' }}>{post.author.about}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </article>
 
         {hasRelated && (
