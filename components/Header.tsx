@@ -24,6 +24,14 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
 
   return (
     <>
+      {/* Covers the notch / Dynamic Island / status-bar area with a solid background.
+          Separate element so it isn't affected by the header's backdrop-filter compositing. */}
+      <div aria-hidden="true" style={{
+        position: 'fixed', top: 0, left: 0, right: 0,
+        height: 'var(--sat, env(safe-area-inset-top, 0px))',
+        background: 'var(--bg)',
+        zIndex: 51,
+      }} />
       <header className="site-header" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
         borderBottom: '1px solid var(--border)',

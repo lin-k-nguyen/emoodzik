@@ -131,13 +131,6 @@ main { padding-top: calc(64px + var(--sat)); }
   height: calc(64px + var(--sat)) !important;
   -webkit-backdrop-filter: blur(12px);
 }
-.site-header::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: var(--sat);
-  background: var(--bg);
-}
 .mobile-menu-overlay { padding-top: var(--sat) !important; }
 
 /* Post detail responsive layout */
