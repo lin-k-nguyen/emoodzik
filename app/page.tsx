@@ -7,6 +7,15 @@ import { fmtDate } from '@/lib/data'
 
 export const revalidate = 60
 
+export const metadata = {
+  title: { absolute: 'EmoodziK — Thảo luận âm nhạc quốc tế' },
+  openGraph: {
+    title: 'EmoodziK — Thảo luận âm nhạc quốc tế',
+    description: 'Blog âm nhạc tiếng Việt — reviews, features, và phỏng vấn về âm nhạc quốc tế.',
+    images: ['/assets/banner.png'],
+  },
+}
+
 function cleanWixUrl(url: string): string {
   return url.replace(/~mv2\.(jpg|jpeg|png|webp)~mv2\.\w+/gi, '~mv2.$1')
 }
@@ -40,7 +49,6 @@ export default async function HomePage() {
       <section style={{ padding: 0 }}>
         <div style={{ position: 'relative', width: '100%', height: 'clamp(200px,28vw,400px)', overflow: 'hidden', background: 'var(--secondary)' }}>
           <Image src={settings?.homeBanner ? urlFor(settings.homeBanner).width(1600).height(600).url() : '/assets/banner.png'} alt="EmoodziK Music Blog" fill style={{ objectFit: 'cover', objectPosition: 'left bottom', transform: 'scale(1.38)', transformOrigin: 'left bottom' }} priority />
-          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '50%', background: 'linear-gradient(to bottom, transparent, var(--bg))' }} />
         </div>
       </section>
 
@@ -107,11 +115,8 @@ export default async function HomePage() {
 
             {homeSeries.map((s: any) => (
               <section key={s._id} style={{ marginTop: 48, paddingTop: 48, borderTop: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+                <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
                   <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 26, color: 'var(--fg)' }}>{s.title}</h2>
-                  <Link href={`/series/${s.slug.current}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 500, color: 'var(--brand)', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                    Xem chuyên đề <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                  </Link>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   {s.posts.map((p: any) => {

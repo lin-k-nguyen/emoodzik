@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { client, urlFor } from '@/lib/sanity'
 import PostCard from '@/components/PostCard'
 
-const PER_PAGE = 28
+const PER_PAGE = 40
 
 export default function SeriesPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params)
@@ -43,7 +43,7 @@ export default function SeriesPage({ params }: { params: Promise<{ slug: string 
   return (
     <>
       <section style={{ padding: 0 }}>
-        <div style={{ position: 'relative', width: '100%', height: 'clamp(200px,28vw,400px)', overflow: 'hidden', borderBottom: '1px solid var(--border)', background: '#000' }}>
+        <div style={{ position: 'relative', width: '100%', height: 'clamp(200px,28vw,400px)', overflow: 'hidden', background: '#000' }}>
           <Image src={seriesBannerSrc} alt="Series" fill style={{ objectFit: 'cover', objectPosition: 'center 50%' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(rgba(8,7,6,0) 35%,rgba(8,7,6,.55) 70%,rgba(8,7,6,.9))' }} />
           <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, maxWidth: 1280, margin: '0 auto', padding: '0 24px 28px', textAlign: 'right' }}>
@@ -52,7 +52,7 @@ export default function SeriesPage({ params }: { params: Promise<{ slug: string 
         </div>
       </section>
 
-      <div style={{ position: 'sticky', top: 64, zIndex: 40, marginTop: 24, background: 'var(--bg)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+      <div className="sticky-below-header" style={{ zIndex: 40, marginTop: 24, background: 'var(--bg)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
         <nav className="scroller" style={{ margin: '0 auto', maxWidth: 1280, padding: '0 24px', display: 'flex', gap: 4, overflowX: 'auto' }}>
           {seriesList.map(s => {
             const active = s.slug.current === activeTab

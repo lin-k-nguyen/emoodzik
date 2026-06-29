@@ -116,13 +116,51 @@ h1, h2 {
 
 /* Nav uppercase */
 nav a, nav button { text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; font-weight: 500; }
+
+/* Fixed header offset */
+main { padding-top: 64px; }
+
+/* Sticky elements that need to clear the fixed header */
+.sticky-below-header { position: sticky; top: 64px; }
+
 /* iPhone safe area */
 @supports (padding-top: env(safe-area-inset-top)) {
   header {
     padding-top: env(safe-area-inset-top) !important;
     height: calc(64px + env(safe-area-inset-top)) !important;
   }
+  main {
+    padding-top: calc(64px + env(safe-area-inset-top));
+  }
+  .sticky-below-header {
+    top: calc(64px + env(safe-area-inset-top));
+  }
   .mobile-menu-overlay {
     padding-top: env(safe-area-inset-top) !important;
+  }
+}
+
+/* Post detail responsive layout */
+.post-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 64px;
+  align-items: start;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 64px 24px 96px;
+}
+@media (max-width: 840px) {
+  .post-layout {
+    display: block;
+    max-width: 100%;
+    padding: 32px 20px 72px;
+  }
+  .post-layout aside {
+    border-left: none !important;
+    padding-left: 0 !important;
+    margin-top: 48px;
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
   }
 }
