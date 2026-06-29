@@ -181,7 +181,7 @@ export default function PostDetail({ slug }: { slug: string }) {
 
           {coverSrc && (
             <div style={{ position: 'relative', marginTop: 40, width: '100%', aspectRatio: '16/9', overflow: 'hidden', background: 'var(--muted)' }}>
-              <Image src={coverSrc} alt={post.title} fill style={{ objectFit: 'cover' }} unoptimized={!post.mainImage} />
+              <Image src={coverSrc} alt={post.title} fill style={{ objectFit: 'contain' }} unoptimized={!post.mainImage} />
             </div>
           )}
 
