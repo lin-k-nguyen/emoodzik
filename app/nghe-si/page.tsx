@@ -103,8 +103,8 @@ export default function NgheSiPage() {
                 <h2 style={{ margin: '0 0 12px', fontFamily: 'var(--font-serif)', fontSize: 32, fontWeight: 700, lineHeight: 1, color: 'var(--brand)' }}>{L}</h2>
                 <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
                   {(byLetter.get(L) ?? []).map((a: any) => (
-                    <li key={a._id} style={{ borderBottom: '1px solid var(--border)' }}>
-                      <Link href={`/nghe-si/${a.slug?.current}`} style={{ display: 'block', padding: '12px 0', color: 'var(--fg)', textDecoration: 'none', fontSize: 17 }}>{a.name}</Link>
+                    <li key={a._id}>
+                      <Link href={`/nghe-si/${a.slug?.current}`} style={{ display: 'block', padding: '11px 0', color: 'var(--fg)', textDecoration: 'none', fontSize: 17 }}>{a.name}</Link>
                     </li>
                   ))}
                 </ul>
