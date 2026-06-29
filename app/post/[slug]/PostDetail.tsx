@@ -94,9 +94,7 @@ function YouTubeEmbed({ url }: { url: string }) {
           fontSize: 12, padding: '4px 10px',
           textDecoration: 'none', borderRadius: '9999px',
         }}
-      >
-        Xem trên YouTube &#x2197;
-      </a>
+      >{'Xem tren YouTube'}</a>
     </div>
   )
 }
