@@ -67,12 +67,11 @@ function YouTubeEmbed({ url }: { url: string }) {
         alt="YouTube video"
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
       />
-      <div style={{
+      <div className="fab" style={{
         position: 'absolute', top: '50%', left: '50%',
         transform: 'translate(-50%,-50%)',
         width: 72, height: 72,
         background: 'rgba(255,0,0,0.9)',
-        borderRadius: '9999px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
       }}>
@@ -89,7 +88,7 @@ function YouTubeEmbed({ url }: { url: string }) {
           position: 'absolute', bottom: 12, right: 12,
           background: 'rgba(0,0,0,0.7)', color: '#fff',
           fontSize: 12, padding: '4px 10px',
-          textDecoration: 'none', borderRadius: '9999px',
+          textDecoration: 'none',
         }}
       >
         {'Xem tren YouTube'}
