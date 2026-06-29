@@ -1,133 +1,16 @@
-'use client'
+import type { Metadata } from 'next'
+import MusicBlogClient from './client'
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import { client, urlFor } from '@/lib/sanity'
-import PostCard from '@/components/PostCard'
-
-const PER_PAGE = 40
-
-export default function MusicBlogPage() {
-  const [categories, setCategories] = useState<any[]>([])
-  const [activeCat, setActiveCat] = useState<string>('all')
-  const [posts, setPosts] = useState<any[]>([])
-  const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(true)
-  const [visibleCount, setVisibleCount] = useState(PER_PAGE)
-  const [bannerUrl, setBannerUrl] = useState<string | null>(null)
-
-  useEffect(() => {
-    client.fetch(`*[_type == "category"] | order(title asc) { _id, title, slug }`).then(setCategories)
-    client.fetch(`*[_type == "siteSettings"][0] { musicBlogBanner }`).then(s => {
-      if (s?.musicBlogBanner) setBannerUrl(urlFor(s.musicBlogBanner).width(1600).height(600).url())
-    })
-  }, [])
-
-  useEffect(() => {
-    setLoading(true)
-    setVisibleCount(PER_PAGE)
-    const query = activeCat === 'all'
-      ? `*[_type == "post"] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title, slug}, author->{name, slug, avatar} }`
-      : `*[_type == "post" && category->slug.current == $cat] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title, slug}, author->{name, slug, avatar} }`
-    client.fetch(query, { cat: activeCat }).then(data => {
-      setPosts(data)
-      setLoading(false)
-    })
-  }, [activeCat])
-
-  const totalPages = Math.max(1, Math.ceil(posts.length / PER_PAGE))
-  const currentPage = Math.min(page, totalPages)
-  const pagePosts = posts.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE)
-
-  const allCategories = [{ _id: 'all', title: 'Tất tần tật', slug: { current: 'all' } }, ...categories]
-
-  return (
-    <>
-      <section style={{ padding: 0 }}>
-        <div style={{ position: 'relative', width: '100%', height: 'clamp(200px,28vw,400px)', overflow: 'hidden', background: '#000' }}>
-          <Image src={bannerUrl ?? '/assets/music-blog-banner.jpg'} alt="Music Blog" fill style={{ objectFit: 'cover', objectPosition: 'center 42%' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(rgba(8,7,6,0) 35%,rgba(8,7,6,.55) 70%,rgba(8,7,6,.9))' }} />
-          <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, margin: '0 auto', maxWidth: 1280, padding: '0 24px 28px', textAlign: 'right' }}>
-            <h1 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 'clamp(38px,8vw,76px)', fontWeight: 700, lineHeight: .95, color: '#ff2e2e', textTransform: 'uppercase', textShadow: '0 2px 16px rgba(0,0,0,.85)' }}>Music Blog</h1>
-          </div>
-        </div>
-      </section>
-
-      <div className="sticky-below-header" style={{ zIndex: 40, marginTop: 24, background: 'var(--bg)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
-        <nav className="scroller" style={{ margin: '0 auto', maxWidth: 1280, padding: '0 24px', display: 'flex', gap: 4, overflowX: 'auto' }}>
-          {allCategories.map(cat => {
-            const active = cat.slug.current === activeCat
-            return (
-              <button key={cat._id} onClick={() => { setActiveCat(cat.slug.current); setPage(1) }} style={{
-                flex: '0 0 auto', appearance: 'none', cursor: 'pointer', border: 'none',
-                borderBottom: `2px solid ${active ? '#ff2e2e' : 'var(--border)'}`,
-                background: active ? '#ff2e2e' : 'transparent',
-                color: active ? '#fff' : 'var(--fg)',
-                fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: active ? 600 : 500,
-                textTransform: 'uppercase', letterSpacing: '.02em', padding: '16px 18px', whiteSpace: 'nowrap',
-              }}>
-                {cat.title}
-              </button>
-            )
-          })}
-        </nav>
-      </div>
-
-      <section style={{ margin: '0 auto', maxWidth: 1280, padding: '28px 24px 80px' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', paddingBottom: 20 }}>
-          <span style={{ fontSize: 13, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--muted-fg)' }}>{posts.length} bài viết</span>
-        </div>
-        {loading ? (
-          <p style={{ textAlign: 'center', color: 'var(--muted-fg)', padding: 40 }}>Đang tải...</p>
-        ) : (
-          <>
-            {/* Desktop: numbered pagination */}
-            <div className="desk" style={{ display: 'block' }}>
-              <div className="grid-4">
-                {pagePosts.map(p => <PostCard key={p._id} post={p} author={p.author} sanity />)}
-              </div>
-              {totalPages > 1 && (
-                <nav style={{ marginTop: 64, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-                  {currentPage > 1 && (
-                    <button onClick={() => setPage(p => p - 1)} style={pgBtn(false)}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg>
-                    </button>
-                  )}
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
-                    <button key={n} onClick={() => setPage(n)} style={pgBtn(n === currentPage)}>{n}</button>
-                  ))}
-                  {currentPage < totalPages && (
-                    <button onClick={() => setPage(p => p + 1)} style={pgBtn(false)}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>
-                    </button>
-                  )}
-                </nav>
-              )}
-            </div>
-
-            {/* Mobile: Xem thêm */}
-            <div className="mob" style={{ flexDirection: 'column' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-                {posts.slice(0, visibleCount).map(p => <PostCard key={p._id} post={p} author={p.author} sanity />)}
-              </div>
-              {visibleCount < posts.length && (
-                <button onClick={() => setVisibleCount(v => v + PER_PAGE)} style={{ marginTop: 32, width: '100%', height: 52, border: '1px solid var(--border)', background: 'none', color: 'var(--fg)', fontSize: 15, fontFamily: 'inherit', cursor: 'pointer', fontWeight: 500 }}>
-                  Xem thêm
-                </button>
-              )}
-            </div>
-          </>
-        )}
-      </section>
-    </>
-  )
+export const metadata: Metadata = {
+  title: 'Music Blog',
+  description: 'Tất cả bài viết về âm nhạc — reviews, features, và phỏng vấn.',
+  openGraph: {
+    title: 'Music Blog | EmoodziK',
+    description: 'Tất cả bài viết về âm nhạc — reviews, features, và phỏng vấn.',
+    images: [{ url: '/assets/banner.png', width: 1200, height: 630 }],
+  },
 }
 
-const pgBtn = (active: boolean): React.CSSProperties => ({
-  appearance: 'none', cursor: 'pointer', display: 'flex',
-  minWidth: 44, height: 44, alignItems: 'center', justifyContent: 'center', padding: '0 8px',
-  border: `1px solid ${active ? '#ff2e2e' : 'var(--border)'}`,
-  background: active ? '#ff2e2e' : 'transparent',
-  color: active ? '#fff' : 'var(--fg)',
-  fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600,
-})
+export default function MusicBlogPage() {
+  return <MusicBlogClient />
+}

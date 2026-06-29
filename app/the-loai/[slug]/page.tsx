@@ -1,87 +1,36 @@
-'use client'
-
-import { useState, useEffect, use } from 'react'
-import Link from 'next/link'
+import type { Metadata } from 'next'
 import { client } from '@/lib/sanity'
-import PostCard from '@/components/PostCard'
+import CategoryClient from './client'
 
-const PER_PAGE = 28
-
-export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params)
-  const [cat, setCat] = useState<any>(null)
-  const [posts, setPosts] = useState<any[]>([])
-  const [page, setPage] = useState(1)
-  const [visibleCount, setVisibleCount] = useState(PER_PAGE)
-
-  useEffect(() => {
-    setVisibleCount(PER_PAGE)
-    if (slug === 'all') {
-      setCat({ title: 'Tất tần tật', slug: { current: 'all' } })
-      client.fetch(`*[_type == "post"] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title,slug}, author->{name,slug,avatar} }`)
-        .then(setPosts)
-    } else {
-      client.fetch(`*[_type == "category" && slug.current == $slug][0] { title, slug, description }`, { slug }).then(setCat)
-      client.fetch(`*[_type == "post" && category->slug.current == $slug] | order(publishedAt desc) { _id, title, slug, excerpt, publishedAt, mainImage, mainImageUrl, "body": body[_type == "block" && style == "normal"][0...1]{_type, style, children[]{text}}, category->{title,slug}, author->{name,slug,avatar} }`, { slug })
-        .then(setPosts)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  if (slug === 'all') {
+    return {
+      title: 'Tất tần tật',
+      openGraph: {
+        title: 'Tất tần tật | EmoodziK',
+        images: [{ url: '/assets/banner.png', width: 1200, height: 630 }],
+      },
     }
-  }, [slug])
-
-  const totalPages = Math.max(1, Math.ceil(posts.length / PER_PAGE))
-  const currentPage = Math.min(page, totalPages)
-  const pagePosts = posts.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE)
-
-  return (
-    <div style={{ padding: '48px 0 80px' }}>
-      <section style={{ margin: '0 auto', maxWidth: 1280, padding: '0 24px' }}>
-        <nav style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--muted-fg)' }}>
-          <Link href="/music-blog" style={{ textDecoration: 'none', color: 'inherit' }}>Music Blog</Link>
-          <span>/</span>
-          <span style={{ color: 'var(--fg)' }}>{cat?.title}</span>
-        </nav>
-        <h1 style={{ margin: '16px 0 0', fontFamily: 'var(--font-serif)', fontSize: 'clamp(30px,6.5vw,48px)', fontWeight: 600, color: 'var(--fg)' }}>{cat?.title}</h1>
-        {cat?.description && <p style={{ margin: '12px 0 0', maxWidth: 560, fontSize: 18, lineHeight: 1.5, color: 'var(--muted-fg)' }}>{cat.description}</p>}
-      </section>
-
-      <section style={{ margin: '48px auto 0', maxWidth: 1280, padding: '0 24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
-          <span style={{ fontSize: 14, color: 'var(--muted-fg)' }}>{posts.length} bài viết</span>
-        </div>
-        {/* Desktop: numbered pagination */}
-        <div className="desk" style={{ display: 'block' }}>
-          <div className="grid-4" style={{ paddingTop: 40 }}>
-            {pagePosts.map(p => <PostCard key={p._id} post={p} author={p.author} sanity />)}
-          </div>
-          {totalPages > 1 && (
-            <nav style={{ marginTop: 64, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-              {currentPage > 1 && <button onClick={() => setPage(p => p - 1)} style={pgBtn(false)}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg></button>}
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => <button key={n} onClick={() => setPage(n)} style={pgBtn(n === currentPage)}>{n}</button>)}
-              {currentPage < totalPages && <button onClick={() => setPage(p => p + 1)} style={pgBtn(false)}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg></button>}
-            </nav>
-          )}
-        </div>
-
-        {/* Mobile: Xem thêm */}
-        <div className="mob" style={{ flexDirection: 'column' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 32, paddingTop: 40 }}>
-            {posts.slice(0, visibleCount).map(p => <PostCard key={p._id} post={p} author={p.author} sanity />)}
-          </div>
-          {visibleCount < posts.length && (
-            <button onClick={() => setVisibleCount(v => v + PER_PAGE)} style={{ marginTop: 32, width: '100%', height: 52, border: '1px solid var(--border)', background: 'none', color: 'var(--fg)', fontSize: 15, fontFamily: 'inherit', cursor: 'pointer', fontWeight: 500 }}>
-              Xem thêm
-            </button>
-          )}
-        </div>
-      </section>
-    </div>
+  }
+  const cat = await client.fetch(
+    `*[_type == "category" && slug.current == $slug][0] { title, description }`,
+    { slug }
   )
+  const title = cat?.title ?? slug
+  const description = cat?.description ?? `Bài viết chuyên mục ${title} trên EmoodziK.`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: `${title} | EmoodziK`,
+      description,
+      images: [{ url: '/assets/banner.png', width: 1200, height: 630 }],
+    },
+  }
 }
 
-const pgBtn = (active: boolean): React.CSSProperties => ({
-  appearance: 'none', cursor: 'pointer', display: 'flex',
-  minWidth: 44, height: 44, alignItems: 'center', justifyContent: 'center', padding: '0 8px',
-  border: `1px solid ${active ? '#ff2e2e' : 'var(--border)'}`,
-  background: active ? '#ff2e2e' : 'transparent',
-  color: active ? '#fff' : 'var(--fg)',
-  fontFamily: 'var(--font-serif)', fontSize: 16, fontWeight: 600,
-})
+export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
+  return <CategoryClient params={params} />
+}

@@ -34,6 +34,73 @@ function getImageSrc(value: any, w = 1200, h = 675): string | null {
   return null
 }
 
+// Click-to-load YouTube — avoids Vevo/copyright autoblock
+function YouTubeEmbed({ url }: { url: string }) {
+  const [loaded, setLoaded] = useState(false)
+  const videoId = url?.split('v=')[1]?.split('&')[0] ?? url?.split('/').pop()
+  if (!videoId) return null
+
+  const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
+  const thumbFallback = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+
+  if (loaded) {
+    return (
+      <div style={{ margin: '32px 0', position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+          allowFullScreen
+          allow="autoplay"
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      onClick={() => setLoaded(true)}
+      style={{ margin: '32px 0', position: 'relative', paddingBottom: '56.25%', height: 0, cursor: 'pointer', background: '#000' }}
+    >
+      <img
+        src={thumb}
+        onError={e => { (e.target as HTMLImageElement).src = thumbFallback }}
+        alt="YouTube video"
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
+      />
+      {/* Play button */}
+      <div style={{
+        position: 'absolute', top: '50%', left: '50%',
+        transform: 'translate(-50%,-50%)',
+        width: 72, height: 72,
+        background: 'rgba(255,0,0,0.9)',
+        borderRadius: '9999px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+        transition: 'transform 0.15s',
+      }}>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      </div>
+      {/* Watch on YouTube link as fallback */}
+      
+        href={`https://www.youtube.com/watch?v=${videoId}`}
+        target="_blank"
+        rel="noreferrer"
+        onClick={e => e.stopPropagation()}
+        style={{
+          position: 'absolute', bottom: 12, right: 12,
+          background: 'rgba(0,0,0,0.7)', color: '#fff',
+          fontSize: 12, padding: '4px 10px',
+          textDecoration: 'none', borderRadius: '9999px',
+        }}
+      >
+        Xem trên YouTube ↗
+      </a>
+    </div>
+  )
+}
+
 const portableTextComponents = {
   block: {
     normal: ({ children }: any) => (
@@ -68,15 +135,7 @@ const portableTextComponents = {
         </div>
       )
     },
-    youtube: ({ value }: any) => {
-      const videoId = value.url?.split('v=')[1]?.split('&')[0] ?? value.url?.split('/').pop()
-      if (!videoId) return null
-      return (
-        <div style={{ margin: '32px 0', position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-          <iframe src={`https://www.youtube.com/embed/${videoId}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }} allowFullScreen />
-        </div>
-      )
-    },
+    youtube: ({ value }: any) => <YouTubeEmbed url={value.url} />,
   },
 }
 
@@ -219,7 +278,6 @@ export default function PostDetail({ slug }: { slug: string }) {
               </button>
             </div>
           </div>
-
         </article>
 
         {hasRelated && (
@@ -233,7 +291,7 @@ export default function PostDetail({ slug }: { slug: string }) {
                   ? urlFor(p.mainImage).width(160).height(120).url()
                   : p.mainImageUrl ? cleanWixUrl(p.mainImageUrl) : null
                 return (
-                  <Link key={p._id} href={`/post/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
+                  <Link key={p._id} href={`/posts/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
                     <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
                       {relSrc && <Image src={relSrc} alt={p.title} fill style={{ objectFit: 'cover' }} unoptimized={!p.mainImage} />}
                     </div>

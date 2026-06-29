@@ -1,0 +1,118 @@
+'use client'
+
+import { useState, useEffect, use } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { client, urlFor } from '@/lib/sanity'
+
+function fmtDate(d: string) {
+  try { return new Date(d).toLocaleDateString('vi-VN', { year: 'numeric', month: 'long', day: 'numeric' }) }
+  catch { return d }
+}
+
+function cleanWixUrl(url: string): string {
+  return url.replace(/~mv2\.(jpg|jpeg|png|webp)~mv2\.\w+/gi, '~mv2.$1')
+}
+
+export default function AuthorPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params)
+  const [author, setAuthor] = useState<any>(null)
+  const [posts, setPosts] = useState<any[]>([])
+  const [mobileLimit, setMobileLimit] = useState(20)
+
+  useEffect(() => {
+    client.fetch(`*[_type == "author" && slug.current == $slug][0] { _id, name, slug, avatar, about }`, { slug }).then(setAuthor)
+    client.fetch(`*[_type == "post" && author->slug.current == $slug] | order(publishedAt desc) { _id, title, slug, publishedAt, mainImage, mainImageUrl }`, { slug }).then(setPosts)
+  }, [slug])
+
+  if (!author) return <div style={{ padding: 120, textAlign: 'center', color: 'var(--muted-fg)' }}>Đang tải...</div>
+
+  const PostItem = ({ p }: { p: any }) => {
+    const src = p.mainImage
+      ? urlFor(p.mainImage).width(160).height(120).url()
+      : p.mainImageUrl ? cleanWixUrl(p.mainImageUrl) : null
+    return (
+      <Link href={`/post/${p.slug.current}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderTop: '1px solid var(--border)', textDecoration: 'none', color: 'inherit' }}>
+        <div style={{ position: 'relative', flex: '0 0 80px', width: 80, height: 60, background: 'var(--muted)', overflow: 'hidden' }}>
+          {src && <Image src={src} alt={p.title} fill style={{ objectFit: 'cover' }} unoptimized={!p.mainImage} />}
+        </div>
+        <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
+          <h3 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 14, fontWeight: 600, lineHeight: 1.3, color: 'var(--fg)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}>
+            {p.title}
+          </h3>
+          <p style={{ margin: 'auto 0 0', fontSize: 12, color: 'var(--muted-fg)' }}>{fmtDate(p.publishedAt)}</p>
+        </div>
+      </Link>
+    )
+  }
+
+  return (
+    <section style={{ padding: '64px 24px 80px' }}>
+      <div style={{ margin: '0 auto', maxWidth: 1280 }}>
+        <Link href="/bon-nay" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--muted-fg)', textDecoration: 'none' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+          Bọn Này
+        </Link>
+
+        {/* Desktop: 3-column grid — avatar | bio | sidebar */}
+        <div className="desk" style={{ marginTop: 40, display: 'grid', gridTemplateColumns: '260px 1fr 360px', gap: 40, alignItems: 'start' }}>
+
+          {/* Col 1: Avatar + name */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 16 }}>
+            <div style={{ position: 'relative', width: 160, height: 160, background: 'var(--muted)', overflow: 'hidden' }}>
+              {author.avatar && <Image src={urlFor(author.avatar).width(320).height(320).url()} alt={author.name} fill style={{ objectFit: 'cover' }} />}
+            </div>
+            <h1 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 28, fontWeight: 700, color: 'var(--fg)' }}>{author.name}</h1>
+          </div>
+
+          {/* Col 2: Bio */}
+          <div>
+            {author.about && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {author.about.split('\n\n').map((para: string, i: number) => (
+                  <p key={i} style={{ margin: 0, fontSize: 15, lineHeight: 1.8, color: 'var(--muted-fg)' }}>{para}</p>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Col 3: Posts sidebar — flexDirection column so heading is ABOVE the list */}
+          <aside style={{ borderLeft: '1px solid var(--border)', paddingLeft: 40, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
+              <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--fg)' }}>Bài viết</h2>
+              <span style={{ fontSize: 14, color: 'var(--muted-fg)' }}>{posts.length} bài</span>
+            </div>
+            <div style={{ maxHeight: 900, overflowY: 'auto', scrollbarWidth: 'none' }}>
+              {posts.map(p => <PostItem key={p._id} p={p} />)}
+            </div>
+          </aside>
+        </div>
+
+        {/* Mobile: avatar + bio + list */}
+        <div className="mob" style={{ flexDirection: 'column', marginTop: 40 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 16, marginBottom: 32 }}>
+            <div style={{ position: 'relative', width: 120, height: 120, background: 'var(--muted)', overflow: 'hidden' }}>
+              {author.avatar && <Image src={urlFor(author.avatar).width(240).height(240).url()} alt={author.name} fill style={{ objectFit: 'cover' }} />}
+            </div>
+            <h1 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 26, fontWeight: 700, color: 'var(--fg)' }}>{author.name}</h1>
+            {author.about && author.about.split('\n\n').map((para: string, i: number) => (
+              <p key={i} style={{ margin: 0, fontSize: 15, lineHeight: 1.8, color: 'var(--muted-fg)' }}>{para}</p>
+            ))}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: 16 }}>
+            <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--fg)' }}>Bài viết</h2>
+            <span style={{ fontSize: 14, color: 'var(--muted-fg)' }}>{posts.length} bài</span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {posts.slice(0, mobileLimit).map(p => <PostItem key={p._id} p={p} />)}
+          </div>
+          {mobileLimit < posts.length && (
+            <button onClick={() => setMobileLimit(l => l + 20)} style={{ marginTop: 24, width: '100%', height: 48, border: '1px solid var(--border)', background: 'none', color: 'var(--fg)', fontSize: 15, fontFamily: 'inherit', cursor: 'pointer' }}>
+              Xem thêm
+            </button>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}

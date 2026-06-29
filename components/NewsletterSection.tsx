@@ -1,15 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 export default function NewsletterSection() {
-  const [email, setEmail] = useState('')
-  const [subscribed, setSubscribed] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (email.trim()) setSubscribed(true)
-  }
+  useEffect(() => {
+    if (!ref.current) return
+    const s = document.createElement('script')
+    s.src = 'https://subscribe-forms.beehiiv.com/v3/loader.js'
+    s.async = true
+    s.setAttribute('data-beehiiv-form', 'af08fb5c-a935-474a-98c7-2dd2f6754c59')
+    ref.current.appendChild(s)
+    return () => s.remove()
+  }, [])
 
   return (
     <section style={{ padding: 0 }}>
@@ -29,32 +33,7 @@ export default function NewsletterSection() {
               Đăng ký newsletter của EmoodziK để nhận những bài viết chọn lọc về âm nhạc, gear và nghệ thuật lắng nghe. Không spam, huỷ bất cứ lúc nào.
             </p>
           </div>
-          {subscribed ? (
-            <p style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0, fontSize: 14, fontWeight: 500, color: '#fbf7f0' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" strokeWidth="2"><path d="M20 6 9 17l-5-5" /></svg>
-              Cảm ơn bạn đã đăng ký! Kiểm tra email để xác nhận nhé.
-            </p>
-          ) : (
-            <form onSubmit={handleSubmit} style={{ display: 'flex', width: '100%', maxWidth: 448, gap: 12 }}>
-              <input
-                type="email" required value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                style={{ height: 48, width: '100%', border: '1px solid #fff', background: '#fff', padding: '0 20px', fontSize: 14, color: '#1a1614', outline: 'none', fontFamily: 'inherit' }}
-              />
-              <button type="submit" style={{
-                height: 48, flex: 'none', border: 'none',
-                background: email.trim() ? '#ff2e2e' : '#fbf7f0',
-                padding: '0 24px', fontSize: 14, fontWeight: 600,
-                color: email.trim() ? '#fff' : '#1a1614',
-                cursor: 'pointer', fontFamily: 'inherit',
-                textTransform: 'uppercase', letterSpacing: '.05em',
-                transition: 'background .15s, color .15s',
-              }}>
-                Subscribe
-              </button>
-            </form>
-          )}
+          <div ref={ref} style={{ width: '100%', maxWidth: 448 }} />
         </div>
       </div>
     </section>
