@@ -34,7 +34,6 @@ function getImageSrc(value: any, w = 1200, h = 675): string | null {
   return null
 }
 
-// Click-to-load YouTube — avoids Vevo/copyright autoblock
 function YouTubeEmbed({ url }: { url: string }) {
   const [loaded, setLoaded] = useState(false)
   const videoId = url?.split('v=')[1]?.split('&')[0] ?? url?.split('/').pop()
@@ -67,7 +66,6 @@ function YouTubeEmbed({ url }: { url: string }) {
         alt="YouTube video"
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
       />
-      {/* Play button */}
       <div style={{
         position: 'absolute', top: '50%', left: '50%',
         transform: 'translate(-50%,-50%)',
@@ -76,13 +74,11 @@ function YouTubeEmbed({ url }: { url: string }) {
         borderRadius: '9999px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-        transition: 'transform 0.15s',
       }}>
         <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
           <path d="M8 5v14l11-7z" />
         </svg>
       </div>
-      {/* Watch on YouTube link as fallback */}
       
         href={`https://www.youtube.com/watch?v=${videoId}`}
         target="_blank"
@@ -94,7 +90,9 @@ function YouTubeEmbed({ url }: { url: string }) {
           fontSize: 12, padding: '4px 10px',
           textDecoration: 'none', borderRadius: '9999px',
         }}
-      >{'Xem tren YouTube'}</a>
+      >
+        {'Xem tren YouTube'}
+      </a>
     </div>
   )
 }
