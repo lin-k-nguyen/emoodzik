@@ -101,10 +101,10 @@ export default function NgheSiPage() {
             {letters.map(L => (
               <div key={L} style={{ marginBottom: 32 }}>
                 <h2 style={{ margin: '0 0 12px', fontFamily: 'var(--font-serif)', fontSize: 32, fontWeight: 700, lineHeight: 1, color: 'var(--brand)' }}>{L}</h2>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
                   {(byLetter.get(L) ?? []).map((a: any) => (
-                    <li key={a._id}>
-                      <Link href={`/nghe-si/${a.slug?.current}`} style={{ color: 'var(--fg)', textDecoration: 'none', fontSize: 17 }}>{a.name}</Link>
+                    <li key={a._id} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <Link href={`/nghe-si/${a.slug?.current}`} style={{ display: 'block', padding: '12px 0', color: 'var(--fg)', textDecoration: 'none', fontSize: 17 }}>{a.name}</Link>
                     </li>
                   ))}
                 </ul>

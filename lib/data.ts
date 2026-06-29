@@ -75,8 +75,8 @@ export const CATEGORIES: Category[] = [
 ]
 
 export const SERIES: Series[] = [
-  { slug: 'an-sau-gian-trong', label: 'Ẩn Sau Giàn Trống', blurb: 'Series tôn vinh những tay trống thầm lặng đứng sau nhịp điệu của các ban nhạc.' },
   { slug: 'tan-man', label: 'Tản Mạn', blurb: 'Những bài tản mạn, chém gió về âm nhạc và các câu chuyện xoay quanh nghề chơi nhạc.' },
+  { slug: 'an-sau-gian-trong', label: 'Ẩn Sau Giàn Trống', blurb: 'Series tôn vinh những tay trống thầm lặng đứng sau nhịp điệu của các ban nhạc.' },
 ]
 
 export const POSTS: Post[] = [

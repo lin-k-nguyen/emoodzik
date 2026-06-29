@@ -31,7 +31,7 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
         backdropFilter: 'blur(12px)',
         minHeight: 64,
       }}>
-        <div style={{
+        <div className="header-inner" style={{
           margin: '0 auto', maxWidth: 1280,
           display: 'flex', height: '100%',
           alignItems: 'center', justifyContent: 'space-between',
