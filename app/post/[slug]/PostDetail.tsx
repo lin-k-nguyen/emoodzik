@@ -91,7 +91,7 @@ function YouTubeEmbed({ url }: { url: string }) {
           textDecoration: 'none',
         }}
       >
-        {'Xem tren YouTube'}
+        Xem trên YouTube
       </a>
     </div>
   )
