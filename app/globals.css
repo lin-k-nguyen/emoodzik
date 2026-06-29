@@ -123,10 +123,11 @@ main { padding-top: 64px; }
 /* Sticky elements that need to clear the fixed header */
 .sticky-below-header { position: sticky; top: 64px; }
 
-/* iPhone safe area — desktop */
+/* iPhone safe area — viewport-fit=cover lets the header extend behind the notch */
 @supports (padding-top: env(safe-area-inset-top)) {
   header {
     padding-top: env(safe-area-inset-top) !important;
+    height: calc(64px + env(safe-area-inset-top)) !important;
   }
   main {
     padding-top: calc(64px + env(safe-area-inset-top));
@@ -136,24 +137,6 @@ main { padding-top: 64px; }
   }
   .mobile-menu-overlay {
     padding-top: env(safe-area-inset-top) !important;
-  }
-}
-
-/* Mobile: 90px header with nav bar at bottom — overrides @supports above */
-@media (max-width: 840px) {
-  header {
-    padding-top: max(26px, env(safe-area-inset-top)) !important;
-    min-height: max(90px, calc(64px + env(safe-area-inset-top))) !important;
-  }
-  .header-inner {
-    height: 64px !important;
-    align-items: center !important;
-  }
-  main {
-    padding-top: max(90px, calc(64px + env(safe-area-inset-top)));
-  }
-  .sticky-below-header {
-    top: max(90px, calc(64px + env(safe-area-inset-top)));
   }
 }
 
