@@ -39,8 +39,8 @@ function YouTubeEmbed({ url }: { url: string }) {
   const videoId = url?.split('v=')[1]?.split('&')[0] ?? url?.split('/').pop()
   if (!videoId) return null
 
-  const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
-  const thumbFallback = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+  const thumb = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+  const thumbFallback = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
 
   if (loaded) {
     return (
@@ -62,6 +62,7 @@ function YouTubeEmbed({ url }: { url: string }) {
     >
       <img
         src={thumb}
+        onLoad={e => { const img = e.target as HTMLImageElement; if (img.naturalWidth <= 120) img.src = thumbFallback }}
         onError={e => { (e.target as HTMLImageElement).src = thumbFallback }}
         alt="YouTube video"
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
