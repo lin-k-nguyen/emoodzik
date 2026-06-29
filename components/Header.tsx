@@ -24,7 +24,7 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
 
   return (
     <>
-      <header style={{
+      <header className="site-header" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
         borderBottom: '1px solid var(--border)',
         background: 'color-mix(in oklab,var(--bg) 80%,transparent)',
