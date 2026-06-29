@@ -117,39 +117,28 @@ h1, h2 {
 /* Nav uppercase */
 nav a, nav button { text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; font-weight: 500; }
 
-/* Fixed header offset */
-main { padding-top: 64px; }
+/* --sat is set by the <script> probe in <head> (exact px value from JS).
+   The env() fallback here handles no-JS environments. Default 0px = desktop. */
+:root { --sat: env(safe-area-inset-top, 0px); }
 
-/* Sticky elements that need to clear the fixed header */
-.sticky-below-header { position: sticky; top: 64px; }
+/* Fixed header offset — incorporates safe-area on notch iPhones */
+main { padding-top: calc(64px + var(--sat)); }
+.sticky-below-header { position: sticky; top: calc(64px + var(--sat)); }
 
-/* iPhone safe area — viewport-fit=cover lets the nav header extend behind the notch */
-@supports (padding-top: env(safe-area-inset-top)) {
-  .site-header {
-    padding-top: env(safe-area-inset-top) !important;
-    height: calc(64px + env(safe-area-inset-top)) !important;
-    -webkit-backdrop-filter: blur(12px);
-  }
-  /* Solid cap covering the notch area so scrolled content doesn't bleed through */
-  .site-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: env(safe-area-inset-top);
-    background: var(--bg);
-  }
-  main {
-    padding-top: calc(64px + env(safe-area-inset-top));
-  }
-  .sticky-below-header {
-    top: calc(64px + env(safe-area-inset-top));
-  }
-  .mobile-menu-overlay {
-    padding-top: env(safe-area-inset-top) !important;
-  }
+/* Extend header behind the notch and cap it with a solid cover so content doesn't bleed through */
+.site-header {
+  padding-top: var(--sat) !important;
+  height: calc(64px + var(--sat)) !important;
+  -webkit-backdrop-filter: blur(12px);
 }
+.site-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: var(--sat);
+  background: var(--bg);
+}
+.mobile-menu-overlay { padding-top: var(--sat) !important; }
 
 /* Post detail responsive layout */
 .post-layout {
