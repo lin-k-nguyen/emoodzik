@@ -24,11 +24,11 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
 
   return (
     <>
-      {/* Covers the notch / Dynamic Island / status-bar area with a solid background.
-          Separate element so it isn't affected by the header's backdrop-filter compositing. */}
+      {/* Solid cover for the notch / Dynamic Island area.
+          Separate from the frosted-glass header so it isn't affected by backdrop-filter compositing. */}
       <div aria-hidden="true" style={{
         position: 'fixed', top: 0, left: 0, right: 0,
-        height: 'var(--sat, env(safe-area-inset-top, 0px))',
+        height: 'env(safe-area-inset-top, 0px)',
         background: 'var(--bg)',
         zIndex: 51,
       }} />
@@ -105,10 +105,11 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
       {/* Mobile menu — fullscreen overlay */}
       {menuOpen && (
         <div className="mob mobile-menu-overlay" style={{
-          position: 'fixed', inset: 0, zIndex: 60,
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 60,
           background: 'var(--bg)',
           flexDirection: 'column',
           overflowY: 'auto',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}>
           {/* Header bar inside overlay */}
           <div style={{

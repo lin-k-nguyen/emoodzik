@@ -34,7 +34,7 @@ export default function TimKiemClient() {
     if (!q) return []
     return allPosts.filter(p => {
       const artistNames = p.artists?.map((a: any) => a.name).join(' ') ?? ''
-      return norm([p.title, p.category?.title, p.author?.name, artistNames].join(' ')).includes(q)
+      return norm([p.title, p.excerpt, p.category?.title, p.author?.name, artistNames].join(' ')).includes(q)
     })
   }, [query, allPosts])
 
