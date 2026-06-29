@@ -169,7 +169,9 @@ export default function PostDetail({ slug }: { slug: string }) {
             <div style={{ marginTop: 32, display: 'flex', alignItems: 'center', gap: 12, borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '20px 0' }}>
               <Link href={`/bon-nay/${post.author?.slug?.current}`} style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
                 {post.author?.avatar && (
-                  <Image src={urlFor(post.author.avatar).width(88).height(88).url()} alt={post.author.name} width={44} height={44} style={{ borderRadius: '9999px', objectFit: 'cover' }} />
+                  <div className="fab" style={{ position: 'relative', flex: '0 0 44px', width: 44, height: 44, overflow: 'hidden' }}>
+                    <Image src={urlFor(post.author.avatar).width(88).height(88).url()} alt={post.author.name} fill style={{ objectFit: 'cover' }} />
+                  </div>
                 )}
                 <div style={{ fontSize: 14, lineHeight: 1.3 }}>
                   <p style={{ margin: 0, fontWeight: 500, color: 'var(--fg)' }}>{post.author?.name}</p>
@@ -180,7 +182,7 @@ export default function PostDetail({ slug }: { slug: string }) {
           </header>
 
           {coverSrc && (
-            <div style={{ position: 'relative', marginTop: 40, width: '100%', aspectRatio: '16/9', overflow: 'hidden', background: 'var(--muted)' }}>
+            <div style={{ position: 'relative', marginTop: 40, width: '100%', paddingBottom: '56.25%', height: 0, overflow: 'hidden', background: 'var(--muted)' }}>
               <Image src={coverSrc} alt={post.title} fill style={{ objectFit: 'contain' }} unoptimized={!post.mainImage} />
             </div>
           )}
