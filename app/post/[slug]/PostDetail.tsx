@@ -95,7 +95,7 @@ function YouTubeEmbed({ url }: { url: string }) {
           textDecoration: 'none', borderRadius: '9999px',
         }}
       >
-        Xem trên YouTube ↗
+        Xem trên YouTube →
       </a>
     </div>
   )
