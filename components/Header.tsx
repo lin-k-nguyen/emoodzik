@@ -29,6 +29,7 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
         borderBottom: '1px solid var(--border)',
         background: 'color-mix(in oklab,var(--bg) 80%,transparent)',
         backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
         minHeight: 64,
       }}>
         <div className="header-inner" style={{

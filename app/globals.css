@@ -128,6 +128,17 @@ main { padding-top: 64px; }
   .site-header {
     padding-top: env(safe-area-inset-top) !important;
     height: calc(64px + env(safe-area-inset-top)) !important;
+    -webkit-backdrop-filter: blur(12px);
+  }
+  /* Solid cap covering the notch area so scrolled content doesn't bleed through */
+  .site-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    background: var(--bg);
   }
   main {
     padding-top: calc(64px + env(safe-area-inset-top));
