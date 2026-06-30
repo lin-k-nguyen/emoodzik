@@ -24,7 +24,7 @@ export default function NewsletterSection() {
         backgroundSize: 'cover', backgroundPosition: 'center',
         padding: '88px 24px', textAlign: 'center',
       }}>
-        <div style={{ maxWidth: 700, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+        <div className="newsletter-inner" style={{ maxWidth: 700, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
           <div style={{ maxWidth: 576 }}>
             <h2 style={{ margin: 0, fontFamily: 'var(--font-serif)', fontSize: 'clamp(26px,5vw,38px)', fontWeight: 700, letterSpacing: '-.01em', color: '#fbf7f0' }}>
               Nhận bài viết mới qua email
@@ -33,7 +33,7 @@ export default function NewsletterSection() {
               Đăng ký newsletter của EmoodziK để nhận những bài viết chọn lọc về âm nhạc, gear và nghệ thuật lắng nghe. Không spam, huỷ bất cứ lúc nào.
             </p>
           </div>
-          <div ref={ref} style={{ width: '100%', maxWidth: 600 }} />
+          <div ref={ref} className="newsletter-form-wrap" style={{ width: '100%', maxWidth: 600 }} />
         </div>
       </div>
     </section>
