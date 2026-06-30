@@ -24,8 +24,6 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
 
   return (
     <>
-      {/* Solid cover for the notch / Dynamic Island area.
-          Separate from the frosted-glass header so it isn't affected by backdrop-filter compositing. */}
       <div aria-hidden="true" style={{
         position: 'fixed', top: 0, left: 0, right: 0,
         height: 'env(safe-area-inset-top, 0px)',
@@ -50,7 +48,6 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
             Emoodzi<span style={{ color: 'var(--brand)' }}>K</span>
           </Link>
 
-          {/* Desktop nav */}
           <nav className="desk" style={{ alignItems: 'center', gap: 24 }}>
             <Link href="/music-blog" style={navLink}>Music Blog</Link>
             <Link href="/series" style={navLink}>Series</Link>
@@ -79,7 +76,6 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
             </button>
           </nav>
 
-          {/* Mobile controls */}
           <div className="mob" style={{ alignItems: 'center', gap: 4 }}>
             <button type="button" onClick={onSearchOpen} aria-label="Tìm kiếm" style={iconBtn}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -102,16 +98,16 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
         </div>
       </header>
 
-      {/* Mobile menu — fullscreen overlay */}
+      {/* Mobile menu — fullscreen overlay, dvh handles Safari address bar */}
       {menuOpen && (
         <div className="mob mobile-menu-overlay" style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 60,
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 60,
+          height: '100dvh',
           background: 'var(--bg)',
           flexDirection: 'column',
           overflowY: 'auto',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}>
-          {/* Header bar inside overlay */}
           <div style={{
             display: 'flex', height: 64, alignItems: 'center',
             justifyContent: 'space-between', padding: '0 24px',
@@ -125,7 +121,6 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
             </button>
           </div>
 
-          {/* Menu content */}
           <nav style={{ flex: 1, padding: '24px 24px 40px', display: 'flex', flexDirection: 'column', gap: 0 }}>
             <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.15em', color: 'var(--muted-fg)' }}>Music Blog</p>
             {CATEGORIES.map(cat => (
@@ -153,7 +148,6 @@ export default function Header({ onSearchOpen, theme, onThemeToggle }: HeaderPro
                 Bọn Này
               </Link>
             </div>
-
           </nav>
         </div>
       )}
