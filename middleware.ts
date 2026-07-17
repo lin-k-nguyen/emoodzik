@@ -1,4 +1,4 @@
-tsimport { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 export function middleware() {
   return new Response('Site đang bảo trì', { status: 503 })
